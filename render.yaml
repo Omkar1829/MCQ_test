@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: mcqtest
+    runtime: docker
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        sync: false

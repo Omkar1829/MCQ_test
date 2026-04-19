@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuizForge — MCQ Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080a0e;--s1:#0f1219;--s2:#161b25;--s3:#1e2535;
+  --border:#242b3d;--border2:#2e3850;
+  --gold:#e8b84b;--gold2:#f5d080;--blue:#4a8fff;
+  --green:#3ecf7a;--red:#f05050;--amber:#f0a030;--purple:#9b72f5;
+  --text:#dde2ef;--text2:#8993ac;--text3:#525c73;
+  --font:'Syne',sans-serif;--mono:'JetBrains Mono',monospace;--serif:'Instrument Serif',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 80% 10%,rgba(74,143,255,.06) 0%,transparent 60%),radial-gradient(ellipse 40% 30% at 10% 80%,rgba(232,184,75,.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+.app{position:relative;z-index:1;min-height:100vh}
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border);background:rgba(8,10,14,.85);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100}
+.logo{font-size:1.3rem;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#080a0e;font-size:.9rem;font-weight:800}
+.nav-tabs{display:flex;gap:4px}
+.nav-tab{font-family:var(--font);font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;background:transparent;color:var(--text2);transition:all .15s;letter-spacing:.03em}
+.nav-tab:hover{color:var(--text);background:var(--s2)}
+.nav-tab.active{background:var(--s3);color:var(--gold);border:1px solid var(--border2)}
+/* PAGES */
+.page{display:none;animation:fadeUp .35s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+/* HERO */
+.home-hero{padding:70px 32px 50px;max-width:900px;margin:0 auto;text-align:center}
+.hero-eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:20px;display:inline-flex;align-items:center;gap:8px}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';width:32px;height:1px;background:var(--gold);opacity:.4}
+.hero-title{font-family:var(--serif);font-size:clamp(2.4rem,6vw,4rem);line-height:1.1;letter-spacing:-.01em;margin-bottom:18px}
+.hero-title em{color:var(--gold);font-style:italic}
+.hero-sub{color:var(--text2);font-size:1rem;line-height:1.7;max-width:560px;margin:0 auto 36px}
+.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+/* BUTTONS */
+.btn{font-family:var(--font);font-weight:700;font-size:.88rem;border:none;border-radius:10px;padding:12px 24px;cursor:pointer;transition:all .18s ease;display:inline-flex;align-items:center;gap:8px;letter-spacing:.02em;text-decoration:none}
+.btn-gold{background:var(--gold);color:#080a0e}
+.btn-gold:hover{background:var(--gold2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,184,75,.25)}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.btn-ghost{background:transparent;color:var(--text3);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text2);border-color:var(--border2)}
+.btn-danger{background:transparent;color:var(--red);border:1px solid rgba(240,80,80,.3)}
+.btn-danger:hover{background:rgba(240,80,80,.1)}
+.btn-purple{background:rgba(155,114,245,.15);color:var(--purple);border:1px solid rgba(155,114,245,.35)}
+.btn-purple:hover{background:rgba(155,114,245,.28);transform:translateY(-1px)}
+.btn-sm{padding:8px 14px;font-size:.8rem;border-radius:8px}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+/* TESTS GRID */
+.section{padding:32px;max-width:1100px;margin:0 auto}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;gap:16px;flex-wrap:wrap}
+.section-title{font-size:1.3rem;font-weight:800;letter-spacing:-.02em}
+.section-title span{color:var(--gold)}
+.section-actions{display:flex;gap:8px;flex-wrap:wrap}
+.tests-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+.tests-toolbar-left{display:flex;gap:12px;flex:1;flex-wrap:wrap}
+.tests-toolbar .form-input,.tests-toolbar .form-select{min-width:220px}
+.tests-summary{font-family:var(--mono);font-size:.75rem;color:var(--text3)}
+.tests-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.test-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:24px;transition:all .2s ease;position:relative;overflow:hidden}
+.test-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(232,184,75,.04) 0%,transparent 60%);opacity:0;transition:opacity .2s}
+.test-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.test-card:hover::before{opacity:1}
+.card-badge{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;background:var(--s3);border:1px solid var(--border2);border-radius:99px;padding:3px 10px;color:var(--gold);display:inline-block;margin-bottom:12px;text-transform:uppercase}
+.card-title{font-size:1.05rem;font-weight:700;margin-bottom:6px;line-height:1.3}
+.card-desc{font-size:.83rem;color:var(--text2);line-height:1.5;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:.72rem;color:var(--text3);margin-bottom:18px}
+.card-meta span{display:flex;align-items:center;gap:4px}
+.card-actions{display:flex;gap:8px;flex-wrap:wrap}
+.empty-state{grid-column:1/-1;text-align:center;padding:80px 20px;color:var(--text3)}
+.empty-icon{font-size:3rem;margin-bottom:12px;opacity:.4}
+.empty-title{font-size:1.1rem;font-weight:700;margin-bottom:8px;color:var(--text2)}
+/* RANDOM MODAL */
+.rnd-modal{background:var(--s1);border:1px solid var(--border2);border-radius:20px;padding:36px;max-width:600px;width:100%;animation:fadeUp .3s ease;max-height:90vh;overflow-y:auto}
+.rnd-modal::-webkit-scrollbar{width:4px}
+.rnd-modal::-webkit-scrollbar-thumb{background:var(--s3);border-radius:99px}
+.rnd-title{font-size:1.4rem;font-weight:800;margin-bottom:6px}
+.rnd-sub{color:var(--text2);font-size:.88rem;margin-bottom:24px;line-height:1.5}
+.rnd-section{margin-bottom:22px}
+.rnd-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;display:block}
+.rnd-count-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.rnd-count-wrap{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:6px 10px}
+.rnd-count-wrap input[type=number]{background:transparent;border:none;color:var(--gold);font-family:var(--mono);font-size:1.3rem;font-weight:700;width:64px;text-align:center;outline:none}
+.rnd-count-btn{background:var(--s3);border:1px solid var(--border2);color:var(--text);border-radius:7px;width:30px;height:30px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.rnd-count-btn:hover{background:var(--gold);color:#080a0e;border-color:var(--gold)}
+.rnd-pool-info{font-family:var(--mono);font-size:.78rem;color:var(--text3)}
+.rnd-pool-info b{color:var(--green)}
+.rnd-warn{font-family:var(--mono);font-size:.74rem;color:var(--amber);margin-top:8px;padding:8px 12px;background:rgba(240,160,48,.08);border:1px solid rgba(240,160,48,.25);border-radius:8px;display:none}
+.rnd-warn.shown{display:block}
+.test-check-list{display:flex;flex-direction:column;gap:7px;max-height:220px;overflow-y:auto;padding-right:4px}
+.test-check-list::-webkit-scrollbar{width:3px}
+.test-check-list::-webkit-scrollbar-thumb{background:var(--s3);border-radius:99px}
+.tci-label{display:flex;align-items:center;gap:12px;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer;transition:all .15s}
+.tci-label:hover{border-color:var(--border2)}
+.tci-label.checked{border-color:var(--gold);background:rgba(232,184,75,.05)}
+.tci-label input[type=checkbox]{accent-color:var(--gold);width:15px;height:15px;cursor:pointer;flex-shrink:0}
+.tci-info{flex:1;min-width:0}
+.tci-name{font-size:.88rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tci-meta{font-size:.74rem;color:var(--text3);font-family:var(--mono);margin-top:2px}
+.topic-pills{display:flex;gap:7px;flex-wrap:wrap}
+.topic-pill{font-family:var(--mono);font-size:.7rem;padding:5px 12px;border-radius:99px;border:1px solid var(--border2);background:var(--s2);color:var(--text2);cursor:pointer;transition:all .15s;letter-spacing:.05em;user-select:none}
+.topic-pill:hover{border-color:var(--blue);color:var(--blue)}
+.topic-pill.on{background:rgba(74,143,255,.1);border-color:var(--blue);color:var(--blue)}
+.topic-pill.all-on{background:rgba(232,184,75,.1);border-color:var(--gold);color:var(--gold)}
+.rnd-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap}
+/* UPLOAD PAGE */
+.upload-wrap{max-width:760px;margin:0 auto;padding:40px 32px}
+.upload-header{margin-bottom:28px}
+.upload-header h2{font-size:1.8rem;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.upload-header p{color:var(--text2);font-size:.92rem;line-height:1.6}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+.form-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.form-input,.form-select,.form-textarea{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-family:var(--font);font-size:.92rem;transition:border-color .15s;outline:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--gold)}
+.form-textarea{resize:vertical;min-height:80px;line-height:1.5}
+.form-select{cursor:pointer}
+.form-select option{background:var(--s2)}
+.drop-zone{border:2px dashed var(--border2);border-radius:16px;padding:48px 32px;text-align:center;cursor:pointer;transition:all .2s;position:relative;margin-bottom:20px;background:var(--s1)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--gold);background:rgba(232,184,75,.04)}
+.drop-icon{font-size:2.6rem;margin-bottom:12px;opacity:.5}
+.drop-title{font-size:1rem;font-weight:700;margin-bottom:6px}
+.drop-hint{font-size:.85rem;color:var(--text2)}
+.drop-hint code{font-family:var(--mono);font-size:.78rem;background:var(--s3);padding:2px 8px;border-radius:5px;color:var(--gold)}
+.file-queue{display:none;flex-direction:column;gap:8px;margin-bottom:20px}
+.file-queue.shown{display:flex}
+.fq-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.fq-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.fq-total{font-family:var(--mono);font-size:.75rem;color:var(--green);font-weight:600}
+.file-row{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;animation:fadeUp .2s ease}
+.file-row.err{border-color:rgba(240,80,80,.35)}
+.fr-icon{font-size:1.2rem;flex-shrink:0}
+.fr-info{flex:1;min-width:0}
+.fr-name{font-size:.88rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fr-meta{font-size:.74rem;color:var(--text3);font-family:var(--mono);margin-top:2px}
+.fr-meta.ok{color:var(--green)}.fr-meta.bad{color:var(--red)}
+.fr-rm{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text3);padding:4px 8px;cursor:pointer;font-size:.8rem;transition:all .15s;flex-shrink:0}
+.fr-rm:hover{border-color:var(--red);color:var(--red)}
+.template-box{background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px}
+.template-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.template-label{font-size:.85rem;font-weight:700;color:var(--text2)}
+.template-note{font-size:.8rem;color:var(--text2);line-height:1.6;margin-bottom:14px}
+pre{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;overflow-x:auto;font-family:var(--mono);font-size:.78rem;color:#a8c4f0;line-height:1.6;max-height:220px;overflow-y:auto}
+pre .k{color:var(--gold)}pre .s{color:var(--green)}pre .n{color:#c78fff}
+.up-status{border-radius:10px;padding:12px 16px;font-size:.88rem;display:none;margin-bottom:16px}
+.up-status.shown{display:block}
+.up-status.ok{background:rgba(62,207,122,.1);border:1px solid rgba(62,207,122,.3);color:var(--green)}
+.up-status.bad{background:rgba(240,80,80,.1);border:1px solid rgba(240,80,80,.3);color:var(--red)}
+.upload-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.up-progress{display:none;flex:1;min-width:160px}
+.up-progress.shown{display:block}
+.up-prog-lbl{font-family:var(--mono);font-size:.7rem;color:var(--text3);margin-bottom:5px}
+.up-prog-track{height:4px;background:var(--s3);border-radius:99px;overflow:hidden}
+.up-prog-fill{height:100%;background:var(--gold);border-radius:99px;transition:width .35s ease;width:0%}
+/* QUIZ */
+#quiz-overlay{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto}
+#quiz-overlay.active{display:flex;flex-direction:column}
+.quiz-topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);background:rgba(8,10,14,.92);backdrop-filter:blur(20px);position:sticky;top:0;z-index:10;gap:16px;flex-wrap:wrap}
+.quiz-test-name{font-size:.9rem;font-weight:700;color:var(--text2);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quiz-progress-wrap{flex:1;min-width:160px}
+.quiz-prog-row{display:flex;justify-content:space-between;margin-bottom:6px}
+.quiz-prog-label{font-family:var(--mono);font-size:.68rem;color:var(--text3);letter-spacing:.08em}
+.prog-track{height:3px;background:var(--s3);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:99px;transition:width .5s ease}
+.timer-box{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:8px 14px}
+.timer-num{font-family:var(--mono);font-size:1.1rem;font-weight:600;min-width:30px;text-align:center;transition:color .3s}
+.timer-ring-wrap{position:relative;width:36px;height:36px;flex-shrink:0}
+#t-svg{transform:rotate(-90deg)}
+#t-bg{fill:none;stroke:var(--s3);stroke-width:3}
+#t-arc{fill:none;stroke:var(--gold);stroke-width:3;stroke-linecap:round;stroke-dasharray:100.5;stroke-dashoffset:0;transition:stroke-dashoffset .9s linear,stroke .4s}
+.timer-label{font-family:var(--mono);font-size:.65rem;color:var(--text3);letter-spacing:.08em}
+.quiz-body{display:flex;flex:1;min-height:0}
+.q-palette{width:240px;flex-shrink:0;border-right:1px solid var(--border);padding:20px;overflow-y:auto;background:var(--s1)}
+.palette-title{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
+.rnd-palette-badge{font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;background:rgba(155,114,245,.1);border:1px solid rgba(155,114,245,.3);color:var(--purple);border-radius:99px;padding:3px 10px;text-align:center;margin-bottom:12px;display:none}
+.rnd-palette-badge.on{display:block}
+.palette-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:20px}
+.pal-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--s2);color:var(--text2);font-family:var(--mono);font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.pal-btn:hover{border-color:var(--border2);background:var(--s3)}
+.pal-btn.current{border-color:var(--gold);color:var(--gold);background:rgba(232,184,75,.1)}
+.pal-btn.answered{background:rgba(62,207,122,.12);border-color:rgba(62,207,122,.4);color:var(--green)}
+.pal-btn.marked{background:rgba(155,114,245,.12);border-color:rgba(155,114,245,.4);color:var(--purple)}
+.pal-btn.marked.answered{background:rgba(155,114,245,.2)}
+.pal-btn.skipped{background:rgba(240,80,80,.08);border-color:rgba(240,80,80,.25);color:var(--red)}
+.palette-legend{display:flex;flex-direction:column;gap:8px}
+.leg-item{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--text2)}
+.leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.leg-dot.answered{background:rgba(62,207,122,.5)}.leg-dot.marked{background:rgba(155,114,245,.5)}.leg-dot.skipped{background:rgba(240,80,80,.3)}.leg-dot.unanswered{background:var(--s3);border:1px solid var(--border2)}
+.quiz-main{flex:1;padding:32px;overflow-y:auto;max-width:760px}
+.q-meta-row{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.q-num{font-family:var(--mono);font-size:.78rem;color:var(--text3);letter-spacing:.06em}
+.q-topic-tag{font-family:var(--mono);font-size:.68rem;background:var(--s3);border:1px solid var(--border2);border-radius:99px;padding:3px 10px;color:var(--blue);letter-spacing:.06em;text-transform:uppercase}
+.mark-tag{font-family:var(--mono);font-size:.68rem;border-radius:99px;padding:3px 10px;letter-spacing:.06em;text-transform:uppercase;background:rgba(155,114,245,.12);border:1px solid rgba(155,114,245,.3);color:var(--purple);display:none}
+.mark-tag.shown{display:inline-block}
+.q-text{font-size:clamp(1rem,2.5vw,1.18rem);line-height:1.7;font-family:var(--serif);font-weight:400;margin-bottom:28px;color:#eef0f8}
+.options-list{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.opt{background:var(--s1);border:1.5px solid var(--border);border-radius:12px;padding:16px 20px;cursor:pointer;display:flex;align-items:center;gap:16px;font-size:.95rem;line-height:1.5;transition:all .15s;color:var(--text)}
+.opt:hover:not(.locked){border-color:var(--border2);background:var(--s2)}
+.opt-key{font-family:var(--mono);font-size:.75rem;font-weight:600;width:28px;height:28px;border-radius:7px;background:var(--s3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text2);transition:all .15s}
+.opt:hover:not(.locked) .opt-key{background:var(--gold);color:#080a0e;border-color:var(--gold)}
+.opt.correct{border-color:var(--green);background:rgba(62,207,122,.08)}
+.opt.correct .opt-key{background:var(--green);color:#080a0e;border-color:var(--green)}
+.opt.wrong{border-color:var(--red);background:rgba(240,80,80,.08)}
+.opt.wrong .opt-key{background:var(--red);color:#fff;border-color:var(--red)}
+.opt.reveal{border-color:rgba(62,207,122,.4);opacity:.7}
+.opt.reveal .opt-key{background:var(--green);color:#080a0e;border-color:var(--green)}
+.opt.locked{cursor:not-allowed}
+.explanation-card{border-radius:12px;padding:20px 22px;display:none;margin-bottom:24px;animation:fadeUp .3s ease}
+.explanation-card.shown{display:block}
+.explanation-card.correct{background:rgba(62,207,122,.07);border:1px solid rgba(62,207,122,.25)}
+.explanation-card.wrong{background:rgba(240,80,80,.07);border:1px solid rgba(240,80,80,.25)}
+.explanation-card.skipped{background:var(--s2);border:1px solid var(--border2)}
+.expl-head{display:flex;align-items:center;gap:10px;font-weight:700;font-size:.92rem;margin-bottom:8px}
+.expl-answer{font-size:.82rem;color:var(--text2);margin-bottom:10px;font-family:var(--mono)}
+.expl-text{font-size:.9rem;color:#c0c8de;line-height:1.65}
+.quiz-btn-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn-mark{background:transparent;border:1px solid rgba(155,114,245,.4);color:var(--purple);font-family:var(--font);font-size:.82rem;font-weight:700;padding:10px 18px;border-radius:9px;cursor:pointer;transition:all .15s;letter-spacing:.02em}
+.btn-mark:hover{background:rgba(155,114,245,.1)}
+.btn-mark.marked{background:rgba(155,114,245,.15)}
+.quiz-spacer{flex:1}
+/* MODALS */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.modal-overlay.active{display:flex}
+.modal{background:var(--s1);border:1px solid var(--border2);border-radius:20px;padding:36px;max-width:440px;width:100%;animation:fadeUp .3s ease;text-align:center}
+.modal h3{font-size:1.3rem;font-weight:800;margin-bottom:10px}
+.modal p{color:var(--text2);font-size:.9rem;line-height:1.6;margin-bottom:24px}
+.modal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
+.modal-stat{background:var(--s2);border-radius:10px;padding:14px 10px;text-align:center}
+.modal-stat-val{font-family:var(--mono);font-size:1.3rem;font-weight:600}
+.modal-stat-val.g{color:var(--green)}.modal-stat-val.r{color:var(--red)}.modal-stat-val.a{color:var(--amber)}
+.modal-stat-desc{font-size:.72rem;color:var(--text3);margin-top:4px}
+.modal-actions{display:flex;gap:10px;justify-content:center}
+/* RESULT */
+#result-overlay{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto}
+#result-overlay.active{display:block}
+.result-wrap{max-width:860px;margin:0 auto;padding:40px 28px}
+.result-hero{text-align:center;background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:48px 32px;margin-bottom:28px;position:relative;overflow:hidden}
+.result-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(232,184,75,.07) 0%,transparent 70%)}
+.result-score{font-family:var(--serif);font-style:italic;font-size:clamp(4rem,12vw,7rem);color:var(--gold);line-height:1;position:relative}
+.result-pct{font-family:var(--mono);font-size:.85rem;color:var(--text2);margin-top:6px}
+.result-title-txt{font-size:clamp(1.4rem,4vw,2.2rem);font-weight:800;margin-top:16px;margin-bottom:6px;position:relative}
+.result-subtitle{color:var(--text2);font-size:.92rem;position:relative}
+.result-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.r-stat{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:22px 16px;text-align:center}
+.r-stat-val{font-family:var(--mono);font-size:1.8rem;font-weight:600;line-height:1}
+.r-stat-val.green{color:var(--green)}.r-stat-val.red{color:var(--red)}.r-stat-val.amber{color:var(--amber)}.r-stat-val.blue{color:var(--blue)}
+.r-stat-lbl{font-size:.78rem;color:var(--text3);margin-top:6px}
+.topics-panel{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px}
+.panel-title{font-size:1rem;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.topic-row{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.topic-name{font-size:.88rem;min-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topic-bar-wrap{flex:1;height:8px;background:var(--s3);border-radius:99px;overflow:hidden}
+.topic-bar{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+.topic-bar.strong{background:var(--green)}.topic-bar.mid{background:var(--amber)}.topic-bar.weak{background:var(--red)}
+.topic-pct{font-family:var(--mono);font-size:.75rem;color:var(--text3);min-width:36px;text-align:right}
+.log-panel{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:28px}
+.log-scroll{max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:4px}
+.log-scroll::-webkit-scrollbar{width:3px}
+.log-scroll::-webkit-scrollbar-thumb{background:var(--s3);border-radius:99px}
+.log-item{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:10px;background:var(--s2);border-left:3px solid var(--border);font-size:.85rem}
+.log-item.lc{border-color:var(--green)}.log-item.lw{border-color:var(--red)}.log-item.ls{border-color:var(--text3)}
+.log-icon{font-size:.95rem;flex-shrink:0;padding-top:1px}
+.log-content{flex:1}
+.log-q-text{line-height:1.5;margin-bottom:4px}
+.log-ans-text{font-size:.78rem;color:var(--text2);font-family:var(--mono)}
+.result-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+/* HISTORY */
+.history-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{background:var(--s2);padding:12px 16px;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)}
+td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--text2)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--s2)}
+.score-badge{font-family:var(--mono);font-size:.78rem;font-weight:600;padding:3px 10px;border-radius:99px}
+.score-badge.high{background:rgba(62,207,122,.12);color:var(--green);border:1px solid rgba(62,207,122,.3)}
+.score-badge.mid{background:rgba(240,160,48,.12);color:var(--amber);border:1px solid rgba(240,160,48,.3)}
+.score-badge.low{background:rgba(240,80,80,.12);color:var(--red);border:1px solid rgba(240,80,80,.3)}
+/* TOAST + LOADER */
+#toast{position:fixed;bottom:28px;right:28px;z-index:999;background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:14px 20px;font-size:.88rem;font-weight:600;display:none;animation:fadeUp .3s ease;box-shadow:0 8px 32px rgba(0,0,0,.4);max-width:300px}
+#toast.shown{display:block}
+#toast.success{border-color:rgba(62,207,122,.4);color:var(--green)}
+#toast.error{border-color:rgba(240,80,80,.4);color:var(--red)}
+.loader{display:none;position:fixed;inset:0;z-index:500;background:rgba(8,10,14,.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.loader.active{display:flex}
+.spin{width:48px;height:48px;border-radius:50%;border:3px solid var(--border2);border-top-color:var(--gold);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{font-size:.9rem;color:var(--text2)}
+@media(max-width:768px){
+  nav{padding:14px 18px}
+  .section,.upload-wrap{padding:20px 16px}
+  .form-grid{grid-template-columns:1fr}
+  .quiz-body{flex-direction:column}
+  .q-palette{width:100%;border-right:none;border-bottom:1px solid var(--border);padding:14px}
+  .palette-grid{grid-template-columns:repeat(8,1fr)}
+  .quiz-main{padding:20px 16px}
+  .result-stats{grid-template-columns:repeat(2,1fr)}
+  .rnd-modal{padding:22px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- NAV -->
+<nav>
+  <div class="logo"><div class="logo-icon">Q</div>QuizForge</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('home')">Tests</button>
+    <button class="nav-tab" onclick="showPage('upload')">Upload</button>
+    <button class="nav-tab" onclick="showPage('history')">History</button>
+  </div>
+</nav>
+
+<!-- ══ HOME ══ -->
+<div id="page-home" class="page active">
+  <div class="home-hero">
+    <div class="hero-eyebrow">MCQ Test Platform</div>
+    <h1 class="hero-title">Master any subject<br>with <em>focused testing.</em></h1>
+    <p class="hero-sub">Upload unlimited question banks, run timed tests with mark-for-review, and get deep topic-wise analytics.</p>
+    <div class="hero-actions">
+      <button class="btn btn-gold" onclick="showPage('upload')">⬆ Upload Tests</button>
+      <button class="btn btn-purple" onclick="openRandomModal()">🎲 Random Test</button>
+      <button class="btn btn-outline" onclick="downloadTemplate()">⬇ Template</button>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Available <span>Tests</span></h2>
+      <div class="section-actions">
+        <button class="btn btn-purple btn-sm" onclick="openRandomModal()">🎲 Random Mix</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadTests()">↺ Refresh</button>
+      </div>
+    </div>
+    <div class="tests-toolbar">
+      <div class="tests-toolbar-left">
+        <input class="form-input" id="test-search" placeholder="Search by test title, subject, or description" oninput="updateTestFilters()">
+        <select class="form-select" id="topic-filter" onchange="updateTestFilters()">
+          <option value="all">All subjects</option>
+        </select>
+      </div>
+      <div class="tests-summary" id="tests-summary">0 tests</div>
+    </div>
+    <div class="tests-grid" id="tests-grid">
+      <div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">Loading tests…</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ UPLOAD ══ -->
+<div id="page-upload" class="page">
+  <div class="upload-wrap">
+    <div class="upload-header">
+      <h2>Upload Question Banks</h2>
+      <p>Drop one or <strong>multiple JSON files</strong> at once — each becomes a separate test. Batch upload has no limit.</p>
+    </div>
+    <div class="template-note" style="margin-bottom:20px">Best option: upload one JSON file per subject or test. The importer now supports both the old question-array format and a direct subject JSON object with metadata plus questions.</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label class="form-label">Test Title <span style="color:var(--text3)">(for single file; batch auto-names from filename)</span></label>
+        <input class="form-input" id="up-title" placeholder="e.g. Java OOP — Chapter 4">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" id="up-desc" placeholder="Brief description…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Primary Topic</label>
+        <input class="form-input" id="up-topic" placeholder="e.g. Java, DSA, DBMS…">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Time Per Question</label>
+        <select class="form-select" id="up-tpq">
+          <option value="30">30 seconds</option>
+          <option value="60" selected>1 minute</option>
+          <option value="90">90 seconds</option>
+          <option value="120">2 minutes</option>
+          <option value="180">3 minutes</option>
+          <option value="0">No timer</option>
+        </select>
+      </div>
+    </div>
+    <div class="template-box">
+      <div class="template-top">
+        <span class="template-label">📋 JSON Format</span>
+        <button class="btn btn-ghost btn-sm" onclick="downloadTemplate()">⬇ Download Template</button>
+      </div>
+      <div class="template-note">Recommended structure: keep each subject as one JSON object with `title`, `subject`, `description`, `time_per_question`, and `questions`.</div>
+<pre><span class="k">{</span>
+  <span class="s">"title"</span>: <span class="s">"Java OOP - Chapter 4"</span>,
+  <span class="s">"subject"</span>: <span class="s">"Java"</span>,
+  <span class="s">"description"</span>: <span class="s">"Inheritance, abstraction, and interfaces."</span>,
+  <span class="s">"time_per_question"</span>: <span class="n">60</span>,
+  <span class="s">"questions"</span>: [
+    <span class="k">{</span>
+      <span class="s">"topic"</span>: <span class="s">"OOP / Java Basics"</span>,
+      <span class="s">"question"</span>: <span class="s">"Which keyword is used to inherit a class?"</span>,
+      <span class="s">"options"</span>: [<span class="s">"extends"</span>, <span class="s">"implements"</span>, <span class="s">"inherits"</span>, <span class="s">"super"</span>],
+      <span class="s">"correct_answer"</span>: <span class="s">"extends"</span>,
+      <span class="s">"explanation"</span>: <span class="s">"The extends keyword creates an inheritance relationship."</span>
+    <span class="k">}</span>
+  ]
+<span class="k">}</span></pre>
+    </div>
+    <div class="drop-zone" id="drop-zone">
+      <input type="file" id="json-file" accept=".json" multiple>
+      <div class="drop-icon">📂</div>
+      <div class="drop-title">Drop JSON files here</div>
+      <div class="drop-hint">or click to browse &nbsp;·&nbsp; <code>.json</code> &nbsp;·&nbsp; unlimited files at once</div>
+    </div>
+    <div class="file-queue" id="file-queue">
+      <div class="fq-header">
+        <span class="fq-label" id="fq-label">0 files queued</span>
+        <span class="fq-total" id="fq-total"></span>
+      </div>
+      <div id="fq-list"></div>
+    </div>
+    <div class="up-status" id="up-status"></div>
+    <div class="upload-actions">
+      <button class="btn btn-gold" id="up-btn" onclick="submitUpload()" disabled>⬆ Upload All</button>
+      <button class="btn btn-ghost" id="up-clear-btn" onclick="clearAllFiles()" style="display:none">✕ Clear</button>
+      <div class="up-progress" id="up-progress">
+        <div class="up-prog-lbl" id="up-prog-lbl">Uploading…</div>
+        <div class="up-prog-track"><div class="up-prog-fill" id="up-prog-fill"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HISTORY ══ -->
+<div id="page-history" class="page">
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Attempt <span>History</span></h2>
+      <button class="btn btn-ghost btn-sm" onclick="loadHistory()">↺ Refresh</button>
+    </div>
+    <div class="history-table-wrap">
+      <table>
+        <thead><tr><th>Test</th><th>Score</th><th>Correct</th><th>Wrong</th><th>Skipped</th><th>Time</th><th>Date</th></tr></thead>
+        <tbody id="history-body"><tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div><!-- /app -->
+
+<!-- ══ RANDOM MODAL ══ -->
+<div class="modal-overlay" id="random-modal">
+  <div class="rnd-modal">
+    <div class="rnd-title">🎲 Build a Random Test</div>
+    <div class="rnd-sub">Pick how many questions, which tests to draw from, and optionally filter by topic. Questions are shuffled randomly.</div>
+    <!-- Count -->
+    <div class="rnd-section">
+      <span class="rnd-label">Number of Questions</span>
+      <div class="rnd-count-row">
+        <div class="rnd-count-wrap">
+          <button class="rnd-count-btn" onclick="adjCount(-10)">−−</button>
+          <button class="rnd-count-btn" onclick="adjCount(-1)">−</button>
+          <input type="number" id="rnd-count" value="20" min="1" max="9999" oninput="updatePoolInfo()">
+          <button class="rnd-count-btn" onclick="adjCount(1)">+</button>
+          <button class="rnd-count-btn" onclick="adjCount(10)">++</button>
+        </div>
+        <div class="rnd-pool-info">Available pool: <b id="rnd-pool">0</b> questions</div>
+      </div>
+      <div class="rnd-warn" id="rnd-warn">⚠ Requested more than available — will use entire pool.</div>
+    </div>
+    <!-- Tests -->
+    <div class="rnd-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span class="rnd-label" style="margin-bottom:0">Select Tests</span>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:.72rem" onclick="selectAllTests(true)">All</button>
+          <button class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:.72rem" onclick="selectAllTests(false)">None</button>
+        </div>
+      </div>
+      <div class="test-check-list" id="rnd-test-list"></div>
+    </div>
+    <!-- Topics -->
+    <div class="rnd-section" id="rnd-topic-wrap">
+      <span class="rnd-label">Filter by Topic <span style="color:var(--text3);font-weight:400;font-size:.65rem">(optional — default = all)</span></span>
+      <div class="topic-pills" id="rnd-topic-pills"></div>
+    </div>
+    <div class="rnd-actions">
+      <button class="btn btn-ghost" onclick="closeRandomModal()">Cancel</button>
+      <button class="btn btn-purple" onclick="startRandomTest()">Start Random Test →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ QUIZ OVERLAY ══ -->
+<div id="quiz-overlay">
+  <div class="quiz-topbar">
+    <div class="quiz-test-name" id="qt-name">—</div>
+    <div class="quiz-progress-wrap">
+      <div class="quiz-prog-row">
+        <span class="quiz-prog-label" id="qt-counter">Q 1 / 20</span>
+        <span class="quiz-prog-label" id="qt-answered">0 answered</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="qt-prog" style="width:0%"></div></div>
+    </div>
+    <div class="timer-box" id="timer-box">
+      <div class="timer-ring-wrap">
+        <svg id="t-svg" width="36" height="36" viewBox="0 0 36 36">
+          <circle id="t-bg" cx="18" cy="18" r="16"/>
+          <circle id="t-arc" cx="18" cy="18" r="16"/>
+        </svg>
+      </div>
+      <div><div class="timer-num" id="timer-num">60</div><div class="timer-label">SEC</div></div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="openFinishModal()">⏹ Finish</button>
+  </div>
+  <div class="quiz-body">
+    <div class="q-palette">
+      <div class="rnd-palette-badge" id="rnd-badge">🎲 Random Mix</div>
+      <div class="palette-title">Questions</div>
+      <div class="palette-grid" id="palette-grid"></div>
+      <div class="palette-legend">
+        <div class="leg-item"><div class="leg-dot answered"></div>Answered</div>
+        <div class="leg-item"><div class="leg-dot marked"></div>Marked</div>
+        <div class="leg-item"><div class="leg-dot skipped"></div>Skipped</div>
+        <div class="leg-item"><div class="leg-dot unanswered"></div>Not visited</div>
+      </div>
+    </div>
+    <div class="quiz-main">
+      <div class="q-meta-row">
+        <span class="q-num" id="qm-num">Q 1</span>
+        <span class="q-topic-tag" id="qm-topic">—</span>
+        <span class="mark-tag" id="qm-marked">⚑ Marked</span>
+      </div>
+      <div class="q-text" id="qm-text"></div>
+      <div class="options-list" id="options-list"></div>
+      <div class="explanation-card" id="expl-card">
+        <div class="expl-head" id="expl-head"></div>
+        <div class="expl-answer" id="expl-answer"></div>
+        <div class="expl-text" id="expl-text"></div>
+      </div>
+      <div class="quiz-btn-row">
+        <button class="btn-mark" id="mark-btn" onclick="toggleMark()">⚑ Mark for Review</button>
+        <div class="quiz-spacer"></div>
+        <button class="btn btn-ghost btn-sm" id="skip-btn" onclick="skipQuestion()">Skip →</button>
+        <button class="btn btn-gold btn-sm" id="next-btn" onclick="nextQuestion()" style="display:none">Next →</button>
+        <button class="btn btn-gold btn-sm" id="finish-now-btn" onclick="openFinishModal()" style="display:none">Finish Test</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FINISH MODAL ══ -->
+<div class="modal-overlay" id="finish-modal">
+  <div class="modal">
+    <h3>Submit Test?</h3>
+    <p>Review your progress before submitting.</p>
+    <div class="modal-stats">
+      <div class="modal-stat"><div class="modal-stat-val g" id="ms-answered">0</div><div class="modal-stat-desc">Answered</div></div>
+      <div class="modal-stat"><div class="modal-stat-val a" id="ms-marked">0</div><div class="modal-stat-desc">Marked</div></div>
+      <div class="modal-stat"><div class="modal-stat-val r" id="ms-unanswered">0</div><div class="modal-stat-desc">Unanswered</div></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeFinishModal()">Continue</button>
+      <button class="btn btn-gold" onclick="submitTest()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RESULT OVERLAY ══ -->
+<div id="result-overlay">
+  <div class="result-wrap">
+    <div class="result-hero">
+      <div class="result-score" id="r-score">—%</div>
+      <div class="result-pct" id="r-raw">—</div>
+      <div class="result-title-txt" id="r-title">—</div>
+      <div class="result-subtitle" id="r-sub">—</div>
+    </div>
+    <div class="result-stats">
+      <div class="r-stat"><div class="r-stat-val green" id="rs-correct">—</div><div class="r-stat-lbl">Correct</div></div>
+      <div class="r-stat"><div class="r-stat-val red" id="rs-wrong">—</div><div class="r-stat-lbl">Wrong</div></div>
+      <div class="r-stat"><div class="r-stat-val amber" id="rs-skipped">—</div><div class="r-stat-lbl">Skipped</div></div>
+      <div class="r-stat"><div class="r-stat-val blue" id="rs-time">—</div><div class="r-stat-lbl">Time (min)</div></div>
+    </div>
+    <div class="topics-panel"><div class="panel-title">📊 Topic-wise Performance</div><div id="topics-breakdown"></div></div>
+    <div class="log-panel"><div class="panel-title">📋 Question Log</div><div class="log-scroll" id="result-log"></div></div>
+    <div class="result-actions">
+      <button class="btn btn-ghost" id="r-retake-btn" onclick="retakeTest()">↺ Retake</button>
+      <button class="btn btn-purple" onclick="openRandomModal()">🎲 New Random</button>
+      <button class="btn btn-outline" onclick="backToHome()">← All Tests</button>
+    </div>
+  </div>
+</div>
+
+<div class="loader" id="loader"><div class="spin"></div><div class="loader-text" id="loader-text">Loading…</div></div>
+<div id="toast"></div>
+
+<script>
+// ══════ CONFIG ══════
+const API = './api.php';
+
+// ══════ STATE ══════
+let allTests = [];
+let currentTest = null;
+let questions = [];
+let qIndex = 0;
+let qStates = [];
+let timerInterval = null;
+let timeLeft = 60;
+let startTime = null;
+let isRandom = false;
+const CIRC = 100.53;
+let busyTestAction = null;
+
+// upload queue
+let fileQueue = [];
+
+// random modal
+let rndSelectedIds = new Set();
+let rndSelectedTopics = new Set();
+
+// ══════ API ══════
+async function api(action, data={}) {
+  const r = await fetch(API, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,...data})});
+  return r.json();
+}
+
+// ══════ NAVIGATION ══════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-tab')[['home','upload','history'].indexOf(name)].classList.add('active');
+  if(name==='home') loadTests();
+  if(name==='history') loadHistory();
+}
+
+// ══════ TESTS LIST ══════
+async function loadTests() {
+  const g = document.getElementById('tests-grid');
+  g.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Loading…</div></div>';
+  try {
+    const r = await api('list_tests');
+    if(!r.success) throw new Error(r.message);
+    allTests = r.tests;
+    renderTests();
+  } catch(e) {
+    g.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load</div><p style="color:var(--text3);font-size:.82rem;margin-top:6px">${e.message}</p></div>`;
+  }
+}
+
+function renderTests() {
+  const g = document.getElementById('tests-grid');
+  const search = (document.getElementById('test-search')?.value || '').trim().toLowerCase();
+  const topic = document.getElementById('topic-filter')?.value || 'all';
+  const filtered = allTests.filter(t=>{
+    const matchTopic = topic === 'all' || (t.topic || 'General') === topic;
+    const haystack = [t.title, t.topic, t.description].filter(Boolean).join(' ').toLowerCase();
+    const matchSearch = !search || haystack.includes(search);
+    return matchTopic && matchSearch;
+  });
+  renderTestFilters(filtered.length);
+  if(!allTests.length){
+    g.innerHTML='<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No tests yet</div><p style="color:var(--text3);font-size:.83rem;margin-top:8px">Upload JSON files to get started.</p></div>';
+    return;
+  }
+  if(!filtered.length){
+    g.innerHTML='<div class="empty-state"><div class="empty-icon">No</div><div class="empty-title">No matching tests</div><p style="color:var(--text3);font-size:.83rem;margin-top:8px">Try a different search or subject filter.</p></div>';
+    return;
+  }
+  g.innerHTML = filtered.map(t=>`
+    <div class="test-card" data-test-id="${t.id}">
+      <div class="card-badge">${esc(t.topic||'General')}</div>
+      <div class="card-title">${esc(t.title)}</div>
+      <div class="card-desc">${esc(t.description||'No description.')}</div>
+      <div class="card-meta">
+        <span>📝 ${t.total_questions} Qs</span>
+        <span>⏱ ${t.time_per_question>0?t.time_per_question+'s/Q':'No timer'}</span>
+        <span>📅 ${fmtDate(t.created_at)}</span>
+      </div>
+      <div class="card-actions">
+        <button class="btn btn-gold btn-sm" onclick="startTest(${t.id})">▶ Start</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteTest(${t.id},event)">🗑 Delete</button>
+      </div>
+    </div>`).join('');
+  bindTestCardActions();
+}
+
+function renderTestFilters(filteredCount = allTests.length) {
+  const select = document.getElementById('topic-filter');
+  const current = select ? select.value : 'all';
+  const topics = [...new Set(allTests.map(t => t.topic || 'General'))].sort((a,b)=>a.localeCompare(b));
+  if(select){
+    select.innerHTML = `<option value="all">All subjects</option>` + topics.map(tp=>`<option value="${esc(tp)}">${esc(tp)}</option>`).join('');
+    select.value = topics.includes(current) || current === 'all' ? current : 'all';
+  }
+  const summary = document.getElementById('tests-summary');
+  if(summary) summary.textContent = `${filteredCount} of ${allTests.length} test${allTests.length!==1?'s':''}`;
+}
+
+function updateTestFilters() {
+  renderTests();
+}
+
+function bindTestCardActions() {
+  document.querySelectorAll('#tests-grid .test-card').forEach(card=>{
+    const id = Number(card.dataset.testId);
+    const buttons = card.querySelectorAll('.card-actions .btn');
+    buttons.forEach(btn=>{
+      const label = btn.textContent.toLowerCase();
+      btn.removeAttribute('onclick');
+      btn.onclick = null;
+      if(btn.dataset.bound === '1') return;
+      btn.dataset.bound = '1';
+      btn.addEventListener('click', ev=>{
+        ev.preventDefault();
+        ev.stopPropagation();
+        if(label.includes('delete')) deleteTest(id, ev);
+        else if(label.includes('start')) startTest(id);
+      });
+    });
+  });
+}
+
+function setBusyTestAction(value) {
+  busyTestAction = value;
+  renderTests();
+}
+
+async function deleteTest(id, e) {
+  if(e){
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  if(busyTestAction) return;
+  const test = allTests.find(t=>Number(t.id)===Number(id));
+  if(!test){toast('Test not found','error');return;}
+  if(!confirm(`Delete "${test.title}" and all saved results?`)) return;
+  setBusyTestAction(`delete-${id}`);
+  showLoader('Deleting test...');
+  try{
+    const r = await api('delete_test',{test_id:id});
+    if(!r.success) throw new Error(r.message || 'Delete failed');
+    toast('Test deleted','success');
+    await loadTests();
+  } catch(err) {
+    toast(err.message || 'Delete failed','error');
+  } finally {
+    hideLoader();
+    setBusyTestAction(null);
+  }
+  return;
+  showLoader('Deleting…');
+  const r = await api('delete_test',{test_id:id});
+  hideLoader();
+  if(r.success){toast('Deleted','success');loadTests();}
+  else toast(r.message,'error');
+}
+
+// ══════ MULTI-FILE UPLOAD ══════
+const dropZone = document.getElementById('drop-zone');
+const jsonInput = document.getElementById('json-file');
+
+dropZone.addEventListener('dragover', e=>{e.preventDefault();dropZone.classList.add('drag');});
+dropZone.addEventListener('dragleave', ()=>dropZone.classList.remove('drag'));
+dropZone.addEventListener('drop', e=>{e.preventDefault();dropZone.classList.remove('drag');if(e.dataTransfer.files.length) addFiles(e.dataTransfer.files);});
+jsonInput.addEventListener('change', e=>{if(e.target.files.length) addFiles(e.target.files); jsonInput.value='';});
+
+function normalizeQuestionClient(question, fallbackTopic='') {
+  if(!question || typeof question !== 'object' || Array.isArray(question)) return null;
+  const text = String(question.question || '').trim();
+  const options = (Array.isArray(question.options) ? question.options : []).map(opt=>String(opt ?? '').trim()).filter(Boolean);
+  let correct = question.correct_answer;
+  const topic = String(question.topic || fallbackTopic || '').trim();
+  const explanation = String(question.explanation || '').trim();
+  if(!text || options.length < 2 || correct === undefined || correct === null) return null;
+
+  if(Number.isInteger(correct) || /^\d+$/.test(String(correct).trim())){
+    const idx = Number(correct);
+    if(options[idx] !== undefined) correct = options[idx];
+  } else {
+    const value = String(correct).trim();
+    const letters = ['A','B','C','D','E','F'];
+    if(letters.includes(value.toUpperCase()) && options[letters.indexOf(value.toUpperCase())] !== undefined) correct = options[letters.indexOf(value.toUpperCase())];
+    else correct = value;
+  }
+
+  correct = String(correct).trim();
+  if(!correct || !options.includes(correct)) return null;
+  return {topic, question:text, options, correct_answer:correct, explanation};
+}
+
+function parseUploadPayload(raw, fileName) {
+  const data = Array.isArray(raw) ? {questions: raw} : (raw && typeof raw === 'object' ? raw : null);
+  if(!data) throw new Error('JSON must be an array or object');
+
+  const rawQuestions = Array.isArray(raw) ? raw : (data.questions || data.items || data.mcqs);
+  if(!Array.isArray(rawQuestions) || !rawQuestions.length) throw new Error('Missing questions array');
+
+  const subject = String(data.subject || data.topic || '').trim();
+  const title = String(data.title || data.name || data.subject || fileName.replace(/\.json$/i,'')).trim();
+  const description = String(data.description || data.summary || '').trim();
+  const parsedTime = Number.parseInt(data.time_per_question ?? data.timePerQuestion ?? 60, 10);
+  const questions = rawQuestions.map(q=>normalizeQuestionClient(q, subject)).filter(Boolean);
+
+  if(!questions.length) throw new Error('No valid questions found');
+
+  return {
+    title,
+    description,
+    topic: subject,
+    time_per_question: Number.isNaN(parsedTime) ? 60 : Math.max(0, parsedTime),
+    questions,
+    meta: {
+      topics: [...new Set(questions.map(q=>q.topic || 'General'))].filter(Boolean),
+      total: questions.length,
+      invalid: rawQuestions.length - questions.length,
+      mode: Array.isArray(raw) ? 'array' : 'subject'
+    }
+  };
+}
+
+function addFiles(fileList) {
+  Array.from(fileList).forEach(file=>{
+    if(!file.name.endsWith('.json')){toast(`Skipped: ${file.name} (not JSON)`,'error');return;}
+    if(fileQueue.find(f=>f.name===file.name)) return; // dedupe by name
+    const entry = {file, name:file.name, parsed:null, error:null, loading:true};
+    fileQueue.push(entry);
+    const idx = fileQueue.length-1;
+    const reader = new FileReader();
+    reader.onload = ev=>{
+      try {
+        const p = JSON.parse(ev.target.result);
+        fileQueue[idx].parsed = parseUploadPayload(p, file.name);
+      } catch (err) { fileQueue[idx].error = err?.message || 'JSON parse error'; }
+      fileQueue[idx].loading=false;
+      renderQueue();
+    };
+    reader.readAsText(file);
+  });
+  renderQueue();
+}
+
+function renderQueue() {
+  const valid = fileQueue.filter(f=>f.parsed);
+  const totalQ = valid.reduce((s,f)=>s+f.parsed.questions.length,0);
+  if(!fileQueue.length){
+    document.getElementById('file-queue').classList.remove('shown');
+    document.getElementById('up-btn').disabled=true;
+    document.getElementById('up-clear-btn').style.display='none';
+    return;
+  }
+  document.getElementById('file-queue').classList.add('shown');
+  document.getElementById('up-clear-btn').style.display='';
+  document.getElementById('fq-label').textContent=`${fileQueue.length} file${fileQueue.length!==1?'s':''} queued`;
+  document.getElementById('fq-total').textContent=valid.length?`${totalQ} questions total`:'';
+  document.getElementById('fq-list').innerHTML=fileQueue.map((f,i)=>{
+    const meta = f.loading
+      ? 'Parsing...'
+      : f.error
+        ? f.error
+        : `${esc(f.parsed.title)} | ${f.parsed.questions.length} questions | ${(f.parsed.meta.topics.length||1)} topics${f.parsed.meta.invalid?` | ${f.parsed.meta.invalid} skipped`:''}`;
+    const icon = f.loading ? '...' : (f.error ? 'X' : 'OK');
+    return `
+    <div class="file-row${f.error?' err':''}">
+      <span class="fr-icon">${icon}</span>
+      <div class="fr-info">
+        <div class="fr-name">${esc(f.name)}</div>
+        <div class="fr-meta${f.error?' bad':f.parsed?' ok':''}">${meta}</div>
+      </div>
+      <button class="fr-rm" onclick="removeFile(${i})">X</button>
+    </div>`;
+  }).join('');
+  document.getElementById('up-btn').disabled=valid.length===0;
+  setUpStatus('','');
+}
+function removeFile(i){fileQueue.splice(i,1);renderQueue();}
+function clearAllFiles(){fileQueue=[];renderQueue();}
+
+function setUpStatus(msg,type){
+  const el=document.getElementById('up-status');
+  el.textContent=msg;
+  el.className='up-status'+(msg?' shown '+type:'');
+}
+
+async function submitUpload() {
+  const valid = fileQueue.filter(f=>f.parsed);
+  if(!valid.length){setUpStatus('No valid files.','bad');return;}
+  const titleBase=document.getElementById('up-title').value.trim();
+  const desc=document.getElementById('up-desc').value.trim();
+  const topic=document.getElementById('up-topic').value.trim();
+  const tpq=parseInt(document.getElementById('up-tpq').value);
+
+  const progEl=document.getElementById('up-progress');
+  const progFill=document.getElementById('up-prog-fill');
+  const progLbl=document.getElementById('up-prog-lbl');
+  progEl.classList.add('shown');
+  document.getElementById('up-btn').disabled=true;
+
+  let uploaded=0,failed=0;
+  for(let i=0;i<valid.length;i++){
+    const f=valid[i];
+    const payload = {
+      title: titleBase || f.parsed.title || f.name.replace(/\.json$/i,''),
+      description: desc || f.parsed.description || '',
+      topic: topic || f.parsed.topic || '',
+      time_per_question: Number.isNaN(tpq) ? f.parsed.time_per_question : tpq,
+      questions: f.parsed.questions
+    };
+    const title=valid.length===1&&titleBase?titleBase:(titleBase?`${titleBase} — ${f.name.replace('.json','')}`:f.name.replace('.json',''));
+    progLbl.textContent=`Uploading ${i+1}/${valid.length}: ${f.name}`;
+    progFill.style.width=`${(i/valid.length)*100}%`;
+    try{
+      const r=await api('upload_test',payload);
+      if(r.success) uploaded++; else failed++;
+    }catch{failed++;}
+  }
+  progFill.style.width='100%';
+  setTimeout(()=>{progEl.classList.remove('shown');progFill.style.width='0%';},700);
+
+  if(uploaded>0){
+    toast(`${uploaded} test${uploaded>1?'s':''} uploaded! 🎉`,'success');
+    clearAllFiles();
+    document.getElementById('up-title').value='';
+    document.getElementById('up-desc').value='';
+    document.getElementById('up-topic').value='';
+    if(failed>0) setUpStatus(`${failed} file(s) failed. ${uploaded} uploaded OK.`,'bad');
+    else{setUpStatus('','');showPage('home');}
+  } else {
+    setUpStatus('All uploads failed.','bad');
+  }
+  document.getElementById('up-btn').disabled=false;
+}
+
+function downloadTemplate() {
+  const t={
+    title:"Java OOP - Chapter 4",
+    subject:"Java",
+    description:"Inheritance, abstraction, and interfaces.",
+    time_per_question:60,
+    questions:[
+      {topic:"OOP / Java Basics",question:"Which keyword is used to inherit a class in Java?",options:["extends","implements","inherits","super"],correct_answer:"extends",explanation:"The 'extends' keyword establishes an inheritance relationship in Java."},
+      {topic:"OOP / Java Basics",question:"What is the default value of an int in Java?",options:["null","undefined","0","1"],correct_answer:"0",explanation:"Primitive int defaults to 0 in Java."},
+      {topic:"Data Structures",question:"Which data structure uses LIFO order?",options:["Queue","Stack","Heap","Tree"],correct_answer:"Stack",explanation:"Stack follows Last-In-First-Out (LIFO)."}
+    ]
+  };
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(t,null,2)],{type:'application/json'}));
+  a.download='quizforge_template.json';a.click();
+}
+
+// ══════ RANDOM MODAL ══════
+function openRandomModal() {
+  if(!allTests.length){toast('No tests available','error');return;}
+  rndSelectedIds=new Set(allTests.map(t=>t.id));
+  rndSelectedTopics=new Set();
+
+  // Test list
+  document.getElementById('rnd-test-list').innerHTML=allTests.map(t=>`
+    <label class="tci-label checked" id="tci-${t.id}">
+      <input type="checkbox" checked onchange="toggleTestSel(${t.id},this)">
+      <div class="tci-info">
+        <div class="tci-name">${esc(t.title)}</div>
+        <div class="tci-meta">${t.total_questions} Qs · ${esc(t.topic||'General')}</div>
+      </div>
+    </label>`).join('');
+
+  // Topic pills
+  const topicSet=new Set(allTests.map(t=>t.topic).filter(Boolean));
+  const pillsEl=document.getElementById('rnd-topic-pills');
+  pillsEl.innerHTML=`<span class="topic-pill all-on" id="tp-all" onclick="rndTopicAll()">All Topics</span>`
+    +[...topicSet].map(tp=>`<span class="topic-pill" onclick="rndTopicToggle(this,'${esc(tp)}')">${esc(tp)}</span>`).join('');
+
+  updatePoolInfo();
+  document.getElementById('random-modal').classList.add('active');
+}
+function closeRandomModal(){document.getElementById('random-modal').classList.remove('active');}
+
+function selectAllTests(val) {
+  allTests.forEach(t=>{
+    rndSelectedIds[val?'add':'delete'](t.id);
+    const lbl=document.getElementById('tci-'+t.id);
+    if(lbl){lbl.classList.toggle('checked',val);lbl.querySelector('input').checked=val;}
+  });
+  updatePoolInfo();
+}
+
+function toggleTestSel(id,chk) {
+  chk.checked?rndSelectedIds.add(id):rndSelectedIds.delete(id);
+  document.getElementById('tci-'+id).classList.toggle('checked',chk.checked);
+  updatePoolInfo();
+}
+
+function rndTopicAll() {
+  rndSelectedTopics=new Set();
+  document.querySelectorAll('#rnd-topic-pills .topic-pill').forEach(p=>p.classList.remove('on'));
+  document.getElementById('tp-all').className='topic-pill all-on';
+  updatePoolInfo();
+}
+
+function rndTopicToggle(el,tp) {
+  document.getElementById('tp-all').className='topic-pill';
+  if(rndSelectedTopics.has(tp)){rndSelectedTopics.delete(tp);el.classList.remove('on');}
+  else{rndSelectedTopics.add(tp);el.classList.add('on');}
+  if(!rndSelectedTopics.size) rndTopicAll();
+  else updatePoolInfo();
+}
+
+function updatePoolInfo() {
+  let pool=0;
+  allTests.forEach(t=>{
+    if(!rndSelectedIds.has(t.id)) return;
+    if(rndSelectedTopics.size&&!rndSelectedTopics.has(t.topic)) return;
+    pool+=parseInt(t.total_questions||0);
+  });
+  document.getElementById('rnd-pool').textContent=pool;
+  const count=parseInt(document.getElementById('rnd-count').value)||20;
+  document.getElementById('rnd-warn').classList.toggle('shown',count>pool&&pool>0);
+}
+
+function adjCount(d) {
+  const inp=document.getElementById('rnd-count');
+  inp.value=Math.max(1,(parseInt(inp.value)||20)+d);
+  updatePoolInfo();
+}
+
+async function startRandomTest() {
+  if(!rndSelectedIds.size){toast('Select at least one test','error');return;}
+  closeRandomModal();
+  showLoader('Building random test…');
+
+  let pool=[];
+  for(const id of rndSelectedIds) {
+    const r=await api('get_test',{test_id:id});
+    if(r.success){
+      let qs=r.questions;
+      if(rndSelectedTopics.size) qs=qs.filter(q=>rndSelectedTopics.has(q.topic));
+      pool.push(...qs);
+    }
+  }
+  hideLoader();
+
+  if(!pool.length){toast('No questions matched filter','error');return;}
+
+  // Fisher-Yates shuffle
+  for(let i=pool.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [pool[i],pool[j]]=[pool[j],pool[i]];
+  }
+  const count=Math.min(parseInt(document.getElementById('rnd-count').value)||20,pool.length);
+  questions=pool.slice(0,count);
+  currentTest=null;isRandom=true;
+  qIndex=0;qStates=questions.map(()=>({chosen:null,skipped:false,marked:false,visited:false}));
+  startTime=Date.now();
+
+  buildPalette();
+  document.getElementById('qt-name').textContent=`🎲 Random Mix (${count} Qs)`;
+  document.getElementById('rnd-badge').classList.add('on');
+  document.getElementById('quiz-overlay').classList.add('active');
+  loadQ();
+}
+
+// ══════ NORMAL START ══════
+async function startTest(id) {
+  if(busyTestAction) return;
+  setBusyTestAction(`start-${id}`);
+  showLoader('Loading questions...');
+  try{
+    const r=await api('get_test',{test_id:id});
+    if(!r.success) throw new Error(r.message || 'Could not load test');
+    if(!Array.isArray(r.questions) || !r.questions.length) throw new Error('This test has no questions');
+    currentTest=r.test;questions=r.questions;isRandom=false;
+    qIndex=0;qStates=questions.map(()=>({chosen:null,skipped:false,marked:false,visited:false}));
+    startTime=Date.now();
+    buildPalette();
+    document.getElementById('qt-name').textContent=currentTest.title;
+    document.getElementById('rnd-badge').classList.remove('on');
+    document.getElementById('quiz-overlay').classList.add('active');
+    loadQ();
+  } catch(err) {
+    toast(err.message || 'Could not start test','error');
+  } finally {
+    hideLoader();
+    setBusyTestAction(null);
+  }
+  return;
+  showLoader('Loading questions…');
+  const r=await api('get_test',{test_id:id});
+  hideLoader();
+  if(!r.success){toast(r.message,'error');return;}
+  currentTest=r.test;questions=r.questions;isRandom=false;
+  qIndex=0;qStates=questions.map(()=>({chosen:null,skipped:false,marked:false,visited:false}));
+  startTime=Date.now();
+  buildPalette();
+  document.getElementById('qt-name').textContent=currentTest.title;
+  document.getElementById('rnd-badge').classList.remove('on');
+  document.getElementById('quiz-overlay').classList.add('active');
+  loadQ();
+}
+
+// ══════ QUIZ ══════
+function getTPQ(){return isRandom?60:currentTest?parseInt(currentTest.time_per_question):60;}
+
+function loadQ() {
+  stopTimer();
+  const q=questions[qIndex],state=qStates[qIndex];
+  state.visited=true;
+  const total=questions.length;
+  document.getElementById('qt-counter').textContent=`Q ${qIndex+1} / ${total}`;
+  document.getElementById('qt-prog').style.width=`${(qIndex/total)*100}%`;
+  updateAnsweredCount();
+  document.getElementById('qm-num').textContent=`Question ${qIndex+1}`;
+  document.getElementById('qm-topic').textContent=q.topic||'—';
+  document.getElementById('qm-marked').classList.toggle('shown',!!state.marked);
+  const mb=document.getElementById('mark-btn');mb.classList.toggle('marked',!!state.marked);mb.textContent=state.marked?'⚑ Marked':'⚑ Mark for Review';
+  document.getElementById('qm-text').textContent=q.question;
+
+  const KEYS=['A','B','C','D','E','F'];
+  const list=document.getElementById('options-list');list.innerHTML='';
+  const cv=resolveCorrect(q);
+  const locked=state.chosen!==null||state.skipped;
+
+  q.options.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt'+(locked?' locked':'');
+    btn.innerHTML=`<span class="opt-key">${KEYS[i]}</span><span>${esc(opt)}</span>`;
+    if(!locked) btn.onclick=()=>selectOpt(opt,btn);
+    if(locked){
+      if(opt===cv) btn.classList.add('reveal');
+      if(opt===state.chosen){btn.classList.remove('reveal');btn.classList.add(state.chosen===cv?'correct':'wrong');}
+    }
+    list.appendChild(btn);
+  });
+
+  if(locked) showExpl(q,cv,state);
+  else document.getElementById('expl-card').className='explanation-card';
+
+  document.getElementById('skip-btn').style.display=locked?'none':'';
+  document.getElementById('next-btn').style.display=(locked&&qIndex<total-1)?'':'none';
+  document.getElementById('finish-now-btn').style.display=(locked&&qIndex===total-1)?'':'none';
+  updatePalette();
+
+  const tpq=getTPQ();
+  if(tpq>0&&!locked){timeLeft=tpq;document.getElementById('timer-box').style.display='';startTimer();}
+  else document.getElementById('timer-box').style.display=locked?'':'none';
+}
+
+function resolveCorrect(q){
+  const K=['A','B','C','D','E','F'],ca=q.correct_answer;
+  if(K.includes(ca)&&q.options[K.indexOf(ca)]!==undefined) return q.options[K.indexOf(ca)];
+  return ca;
+}
+
+function selectOpt(val,btn) {
+  stopTimer();qStates[qIndex].chosen=val;
+  const q=questions[qIndex],cv=resolveCorrect(q);
+  document.querySelectorAll('.opt').forEach(b=>{b.classList.add('locked');b.onclick=null;if(b.querySelector('span:last-child').textContent===cv) b.classList.add('reveal');});
+  btn.classList.remove('reveal');btn.classList.add(val===cv?'correct':'wrong');
+  showExpl(q,cv,qStates[qIndex]);
+  document.getElementById('skip-btn').style.display='none';
+  const last=qIndex===questions.length-1;
+  document.getElementById('next-btn').style.display=last?'none':'';
+  document.getElementById('finish-now-btn').style.display=last?'':'none';
+  updatePalette();updateAnsweredCount();
+}
+
+function showExpl(q,cv,state) {
+  const card=document.getElementById('expl-card'),head=document.getElementById('expl-head'),ans=document.getElementById('expl-answer'),txt=document.getElementById('expl-text');
+  let type,h,c;
+  if(state.skipped){type='skipped';h='⏭ Skipped';c='var(--text2)';}
+  else if(state.chosen===cv){type='correct';h='✅ Correct!';c='var(--green)';}
+  else{type='wrong';h='❌ Incorrect';c='var(--red)';}
+  card.className=`explanation-card shown ${type}`;head.innerHTML=h;head.style.color=c;
+  ans.textContent=`Correct answer: ${cv}`;txt.textContent=q.explanation||'No explanation provided.';
+}
+
+function skipQuestion(){stopTimer();qStates[qIndex].skipped=true;loadQ();}
+function nextQuestion(){if(qIndex<questions.length-1){qIndex++;loadQ();}else openFinishModal();}
+function toggleMark(){
+  qStates[qIndex].marked=!qStates[qIndex].marked;
+  const m=qStates[qIndex].marked;
+  document.getElementById('qm-marked').classList.toggle('shown',m);
+  const btn=document.getElementById('mark-btn');btn.classList.toggle('marked',m);btn.textContent=m?'⚑ Marked':'⚑ Mark for Review';
+  updatePalette();
+}
+function jumpToQ(i){qIndex=i;loadQ();}
+
+function buildPalette(){
+  const g=document.getElementById('palette-grid');g.innerHTML='';
+  questions.forEach((_,i)=>{const b=document.createElement('button');b.className='pal-btn';b.textContent=i+1;b.onclick=()=>jumpToQ(i);g.appendChild(b);});
+}
+function updatePalette(){
+  const btns=document.querySelectorAll('.pal-btn');
+  qStates.forEach((s,i)=>{const b=btns[i];b.className='pal-btn';if(i===qIndex)b.classList.add('current');if(s.chosen!==null)b.classList.add('answered');if(s.skipped)b.classList.add('skipped');if(s.marked)b.classList.add('marked');});
+}
+function updateAnsweredCount(){document.getElementById('qt-answered').textContent=`${qStates.filter(s=>s.chosen!==null).length} answered`;}
+
+// TIMER
+function startTimer(){
+  const max=getTPQ();updateTimerUI(timeLeft,max);
+  timerInterval=setInterval(()=>{timeLeft--;updateTimerUI(timeLeft,max);if(timeLeft<=0){stopTimer();skipQuestion();}},1000);
+}
+function stopTimer(){clearInterval(timerInterval);timerInterval=null;}
+function updateTimerUI(t,max){
+  const num=document.getElementById('timer-num'),arc=document.getElementById('t-arc');if(!num)return;
+  num.textContent=t;const pct=max>0?t/max:1;
+  arc.style.strokeDashoffset=CIRC*(1-pct);
+  arc.style.stroke=t>max*.4?'var(--gold)':t>max*.2?'var(--amber)':'var(--red)';
+  num.style.color=t<=10?'var(--red)':'var(--text)';
+}
+
+// FINISH
+function openFinishModal(){
+  document.getElementById('ms-answered').textContent=qStates.filter(s=>s.chosen!==null).length;
+  document.getElementById('ms-marked').textContent=qStates.filter(s=>s.marked).length;
+  document.getElementById('ms-unanswered').textContent=qStates.filter(s=>s.chosen===null&&!s.skipped).length;
+  document.getElementById('finish-modal').classList.add('active');
+}
+function closeFinishModal(){document.getElementById('finish-modal').classList.remove('active');}
+
+async function submitTest() {
+  closeFinishModal();stopTimer();
+  const timeTaken=Math.round((Date.now()-startTime)/1000);
+  const answers=questions.map((q,i)=>{
+    const s=qStates[i],cv=resolveCorrect(q);
+    return{q:q.question,topic:q.topic||'General',chosen:s.chosen,correct:cv,skipped:s.skipped,marked:s.marked,wasCorrect:s.chosen!==null&&s.chosen===cv};
+  });
+  const correct=answers.filter(a=>a.wasCorrect).length;
+  const wrong=answers.filter(a=>!a.wasCorrect&&!a.skipped&&a.chosen!==null).length;
+  const skipped=answers.filter(a=>a.skipped||a.chosen===null).length;
+  const total=answers.length,score=Math.round(correct/total*100);
+
+  if(!isRandom&&currentTest){
+    showLoader('Saving results…');
+    await api('save_result',{test_id:currentTest.id,score,total,correct,wrong,skipped,time_taken:timeTaken,answers});
+    hideLoader();
+  }
+  document.getElementById('quiz-overlay').classList.remove('active');
+  showResult({score,correct,wrong,skipped,total,timeTaken,answers});
+}
+
+// RESULT
+function showResult({score,correct,wrong,skipped,total,timeTaken,answers}){
+  document.getElementById('result-overlay').classList.add('active');
+  document.getElementById('r-score').textContent=score+'%';
+  document.getElementById('r-raw').textContent=`${correct} out of ${total} correct`;
+  const g=score>=80?['Excellent! 🎉','Outstanding']:score>=60?['Good Job! 👍','Above average']:score>=40?['Keep Going 💪','Room to improve']:['Needs Work 📚','Review weak areas'];
+  document.getElementById('r-title').textContent=g[0];document.getElementById('r-sub').textContent=g[1];
+  document.getElementById('rs-correct').textContent=correct;document.getElementById('rs-wrong').textContent=wrong;
+  document.getElementById('rs-skipped').textContent=skipped;document.getElementById('rs-time').textContent=(timeTaken/60).toFixed(1);
+
+  const tm={};answers.forEach(a=>{if(!tm[a.topic])tm[a.topic]={c:0,t:0};tm[a.topic].t++;if(a.wasCorrect)tm[a.topic].c++;});
+  document.getElementById('topics-breakdown').innerHTML=Object.entries(tm).sort((a,b)=>a[1].c/a[1].t-b[1].c/b[1].t).map(([t,d])=>{
+    const p=Math.round(d.c/d.t*100),cls=p>=70?'strong':p>=40?'mid':'weak';
+    return `<div class="topic-row"><span class="topic-name" title="${esc(t)}">${esc(t)}</span><div class="topic-bar-wrap"><div class="topic-bar ${cls}" style="width:0%" data-w="${p}%"></div></div><span class="topic-pct">${p}%</span></div>`;
+  }).join('');
+  setTimeout(()=>document.querySelectorAll('.topic-bar').forEach(b=>b.style.width=b.dataset.w),100);
+
+  document.getElementById('result-log').innerHTML=answers.map((a,i)=>{
+    const cls=a.skipped||a.chosen===null?'ls':a.wasCorrect?'lc':'lw';
+    const icon=a.skipped||a.chosen===null?'⏭':a.wasCorrect?'✅':'❌';
+    const al=a.skipped||a.chosen===null?`Skipped · Answer: ${a.correct}`:a.wasCorrect?`Your answer: ${a.chosen}`:`Your answer: ${a.chosen||'—'} · Correct: ${a.correct}`;
+    return `<div class="log-item ${cls}"><span class="log-icon">${icon}</span><div class="log-content"><div class="log-q-text"><strong>Q${i+1}.</strong> ${esc(a.q)}</div><div class="log-ans-text">${al}</div></div></div>`;
+  }).join('');
+
+  document.getElementById('r-retake-btn').style.display=(!isRandom&&currentTest)?'':'none';
+}
+
+function retakeTest(){document.getElementById('result-overlay').classList.remove('active');if(currentTest)startTest(currentTest.id);}
+function backToHome(){document.getElementById('result-overlay').classList.remove('active');showPage('home');}
+
+// HISTORY
+async function loadHistory() {
+  const tb=document.getElementById('history-body');
+  tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">Loading…</td></tr>';
+  const r=await api('get_history');
+  if(!r.success||!r.results.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">No attempts yet.</td></tr>';return;}
+  tb.innerHTML=r.results.map(row=>{
+    const pct=Math.round(row.correct/row.total*100);const cls=pct>=70?'high':pct>=40?'mid':'low';
+    return `<tr><td style="font-weight:600;color:var(--text)">${esc(row.title||'Test')}</td><td><span class="score-badge ${cls}">${pct}%</span></td><td style="color:var(--green)">${row.correct}</td><td style="color:var(--red)">${row.wrong}</td><td style="color:var(--amber)">${row.skipped}</td><td style="font-family:var(--mono);font-size:.8rem">${(row.time_taken/60).toFixed(1)}m</td><td style="font-size:.8rem;color:var(--text3)">${fmtDate(row.taken_at)}</td></tr>`;
+  }).join('');
+}
+
+// UTILS
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}
+function toast(msg,type='success'){const el=document.getElementById('toast');el.textContent=msg;el.className='shown '+type;el.style.display='block';setTimeout(()=>el.style.display='none',3200);}
+function showLoader(msg='Loading…'){document.getElementById('loader-text').textContent=msg;document.getElementById('loader').classList.add('active');}
+function hideLoader(){document.getElementById('loader').classList.remove('active');}
+
+// INIT
+loadTests();
+</script>
+</body>
+</html>
+
+
