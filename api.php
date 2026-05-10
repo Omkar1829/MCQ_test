@@ -27,11 +27,11 @@ if ($databaseUrl) {
     parse_str($parts['query'] ?? '', $queryParams);
     $sslmode = $queryParams['sslmode'] ?? env_value('DB_SSLMODE', 'require');
 } else {
-    $host     = env_value('DB_HOST', "dpg-d77lipqdbo4c73arvtv0-a.singapore-postgres.render.com");
+    $host     = env_value('DB_HOST', "db.ienakmntjzlpkpaxefej.supabase.co");
     $port     = env_value('DB_PORT', "5432");
-    $dbname   = env_value('DB_NAME', "unisphere_h4rb");
-    $user     = env_value('DB_USER', "root");
-    $password = env_value('DB_PASSWORD', "eA4dn3XSdHcuo99MljBnLq1AOnZxpIUY");
+    $dbname   = env_value('DB_NAME', "postgres");
+    $user     = env_value('DB_USER', "postgres");
+    $password = env_value('DB_PASSWORD', "TheBestPasswordEver");
     $sslmode  = env_value('DB_SSLMODE', "require");
 }
 
