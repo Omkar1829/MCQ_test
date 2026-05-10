@@ -168,11 +168,7 @@ tr:hover td{background:rgba(255,255,255,.01)}
       <div class="badge gold">MCQ Test Platform</div>
       <h1 class="hero-title">Master any subject<br>with <em>focused testing.</em></h1>
       <p class="hero-sub">Secure user accounts, personal performance dashboards, topic analytics, and an admin workspace for managing tests, questions, and users.</p>
-      <div class="hero-actions">
-        <button class="btn btn-gold" onclick="openAuth('register')">Create Account</button>
-        <button class="btn btn-purple" onclick="openAuth('login')">Login</button>
-        <button class="btn btn-outline" onclick="showPage('home')">Explore Tests</button>
-      </div>
+      <div class="hero-actions" id="hero-actions"></div>
     </div>
     <div class="wrap">
       <div class="section-head">
@@ -580,6 +576,7 @@ function clearAuth(silent=false){
 
 function renderAuthNav(){
   const nav = document.getElementById('nav-auth');
+  const heroActions = document.getElementById('hero-actions');
   const isAdmin = currentUser?.role === 'admin';
   document.querySelectorAll('[data-auth-only="1"]').forEach(el=>el.classList.toggle('hidden', !currentUser));
   document.querySelectorAll('[data-admin-only="1"]').forEach(el=>el.classList.toggle('hidden', !isAdmin));
@@ -589,10 +586,18 @@ function renderAuthNav(){
       <span class="mono muted">${esc(currentUser.name)}</span>
       <button class="btn btn-outline btn-sm" onclick="showPage('profile')">Profile</button>
       <button class="btn btn-ghost btn-sm" onclick="logout()">Logout</button>`;
+    heroActions.innerHTML = `
+      <button class="btn btn-gold" onclick="showPage('dashboard')">Open Dashboard</button>
+      <button class="btn btn-purple" onclick="showPage('history')">View History</button>
+      <button class="btn btn-outline" onclick="document.getElementById('tests-grid').scrollIntoView({behavior:'smooth',block:'start'})">Explore Tests</button>`;
   } else {
     nav.innerHTML = `
       <button class="btn btn-outline btn-sm" onclick="openAuth('login')">Login</button>
       <button class="btn btn-gold btn-sm" onclick="openAuth('register')">Register</button>`;
+    heroActions.innerHTML = `
+      <button class="btn btn-gold" onclick="openAuth('register')">Create Account</button>
+      <button class="btn btn-purple" onclick="openAuth('login')">Login</button>
+      <button class="btn btn-outline" onclick="document.getElementById('tests-grid').scrollIntoView({behavior:'smooth',block:'start'})">Explore Tests</button>`;
   }
 }
 
@@ -727,6 +732,34 @@ function renderTests(){
 
 function setBusyTestAction(value){ busyTestAction = value; renderTests(); }
 
+function normalizeRuntimeQuestion(question){
+  if(!question || typeof question !== 'object') return null;
+  const options = Array.isArray(question.options)
+    ? question.options
+    : (() => {
+        if(typeof question.options !== 'string') return [];
+        try {
+          const parsed = JSON.parse(question.options);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch(_err) {
+          return question.options
+            .split('|')
+            .map(item=>item.trim())
+            .filter(Boolean);
+        }
+      })();
+  const text = String(question.question || '').trim();
+  if(!text || !options.length) return null;
+  return {
+    ...question,
+    topic: String(question.topic || '').trim(),
+    question: text,
+    options: options.map(item=>String(item ?? '').trim()).filter(Boolean),
+    correct_answer: String(question.correct_answer ?? '').trim(),
+    explanation: String(question.explanation ?? '').trim()
+  };
+}
+
 async function startTest(id){
   if(!currentUser){openAuth('login');toast('Login to start a test','error');return;}
   if(busyTestAction) return;
@@ -735,9 +768,12 @@ async function startTest(id){
   try{
     const r = await api('get_test',{test_id:id});
     if(!r.success) throw new Error(r.message || 'Could not load test');
-    if(!Array.isArray(r.questions) || !r.questions.length) throw new Error('This test has no questions.');
+    const normalizedQuestions = (Array.isArray(r.questions) ? r.questions : [])
+      .map(normalizeRuntimeQuestion)
+      .filter(Boolean);
+    if(!normalizedQuestions.length) throw new Error('This test has no valid questions.');
     currentTest = r.test;
-    questions = r.questions;
+    questions = normalizedQuestions;
     isRandom = false;
     qIndex = 0;
     qStates = questions.map(()=>({chosen:null,skipped:false,marked:false}));
@@ -748,6 +784,7 @@ async function startTest(id){
     document.getElementById('quiz-overlay').classList.add('active');
     loadQuestion();
   } catch(err){
+    console.error('startTest failed', err);
     toast(err.message || 'Could not start test','error');
   } finally {
     hideLoader();
