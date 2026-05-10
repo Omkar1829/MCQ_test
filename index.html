@@ -1,243 +1,1026 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QuizForge - Smart MCQ Platform</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#080a0e;--s1:#0f1219;--s2:#161b25;--s3:#1e2535;--s4:#242c3e;
-  --border:#242b3d;--border2:#2e3850;--gold:#e8b84b;--gold2:#f5d080;--blue:#4a8fff;
-  --green:#3ecf7a;--red:#f05050;--amber:#f0a030;--purple:#9b72f5;--text:#dde2ef;--text2:#8993ac;--text3:#525c73;
-  --font:'Syne',sans-serif;--mono:'JetBrains Mono',monospace;--serif:'Instrument Serif',serif;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 85% 10%,rgba(74,143,255,.07) 0%,transparent 60%),radial-gradient(ellipse 40% 30% at 15% 75%,rgba(232,184,75,.05) 0%,transparent 60%);pointer-events:none}
-.app{position:relative;z-index:1;min-height:100vh}
-nav{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--border);background:rgba(8,10,14,.88);backdrop-filter:blur(18px);position:sticky;top:0;z-index:20;gap:16px;flex-wrap:wrap}
-.logo{display:flex;align-items:center;gap:10px;font-size:1.3rem;font-weight:800}
-.logo-icon{width:34px;height:34px;border-radius:10px;background:var(--gold);display:flex;align-items:center;justify-content:center;color:#080a0e;font-weight:800}
-.nav-left,.nav-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.nav-tab,.btn,.icon-btn,.input,.select,.textarea{font-family:var(--font)}
-.nav-tab{font-size:.84rem;font-weight:700;padding:9px 15px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--text2);cursor:pointer}
-.nav-tab:hover,.nav-tab.active{background:var(--s3);border-color:var(--border2);color:var(--gold)}
-.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase}
-.badge.gold{background:rgba(232,184,75,.12);border:1px solid rgba(232,184,75,.3);color:var(--gold)}
-.badge.blue{background:rgba(74,143,255,.12);border:1px solid rgba(74,143,255,.3);color:var(--blue)}
-.badge.purple{background:rgba(155,114,245,.12);border:1px solid rgba(155,114,245,.3);color:var(--purple)}
-.btn{border:none;border-radius:12px;padding:12px 18px;font-weight:800;font-size:.88rem;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none;transition:all .18s}
-.btn-gold{background:var(--gold);color:#080a0e}
-.btn-gold:hover{background:var(--gold2);transform:translateY(-1px)}
-.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border2)}
-.btn-outline:hover{color:var(--gold);border-color:var(--gold)}
-.btn-purple{background:rgba(155,114,245,.16);color:var(--purple);border:1px solid rgba(155,114,245,.35)}
-.btn-purple:hover{background:rgba(155,114,245,.24)}
-.btn-danger{background:transparent;color:var(--red);border:1px solid rgba(240,80,80,.35)}
-.btn-danger:hover{background:rgba(240,80,80,.08)}
-.btn-ghost{background:transparent;color:var(--text3);border:1px solid var(--border)}
-.btn-ghost:hover{border-color:var(--border2);color:var(--text2)}
-.btn-sm{padding:9px 14px;font-size:.8rem;border-radius:10px}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
-.page{display:none;animation:fade .3s ease}
-.page.active{display:block}
-@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.hero{padding:72px 24px 40px;max-width:940px;margin:0 auto;text-align:center}
-.hero-title{font-family:var(--serif);font-size:clamp(2.5rem,7vw,4.4rem);line-height:1.05;margin-bottom:18px}
-.hero-title em{color:var(--gold);font-style:italic}
-.hero-sub{max-width:640px;margin:0 auto 30px;color:var(--text2);font-size:1.02rem;line-height:1.7}
-.hero-actions,.section-actions,.toolbar,.split-actions{display:flex;gap:12px;flex-wrap:wrap}
-.hero-actions{justify-content:center}
-.wrap{max-width:1180px;margin:0 auto;padding:28px 24px 52px}
-.section-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
-.title{font-size:1.4rem;font-weight:800;letter-spacing:-.03em}
-.title span{color:var(--gold)}
-.panel,.card,.table-wrap,.empty,.drop-zone{background:var(--s1);border:1px solid var(--border);border-radius:18px}
-.panel{padding:24px}
-.grid{display:grid;gap:16px}
-.tests-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-.card{padding:22px;position:relative;overflow:hidden}
-.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(232,184,75,.05),transparent 60%);opacity:0;transition:opacity .18s}
-.card:hover::before{opacity:1}
-.card:hover{border-color:var(--border2);transform:translateY(-1px)}
-.card-title{font-size:1.08rem;font-weight:800;margin:10px 0 6px}
-.card-desc{color:var(--text2);font-size:.84rem;line-height:1.6;min-height:44px}
-.meta{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0;font-family:var(--mono);font-size:.73rem;color:var(--text3)}
-.toolbar{align-items:center;justify-content:space-between;margin-bottom:18px}
-.toolbar-left{display:flex;gap:12px;flex-wrap:wrap;flex:1}
-.input,.select,.textarea{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-size:.92rem;outline:none}
-.input:focus,.select:focus,.textarea:focus{border-color:var(--gold)}
-.input,.select{min-height:46px}
-.textarea{width:100%;resize:vertical;min-height:110px;line-height:1.55}
-.toolbar .input,.toolbar .select{min-width:220px}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
-.stat-card{background:var(--s2);border:1px solid var(--border);border-radius:16px;padding:18px}
-.stat-val{font-family:var(--mono);font-size:1.8rem;font-weight:700}
-.stat-lbl{font-size:.8rem;color:var(--text3);margin-top:4px}
-.two-col{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
-.three-col{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.auth-shell{max-width:1040px;margin:0 auto;padding:30px 24px 50px}
-.auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.auth-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-.auth-tab{padding:10px 14px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-weight:700}
-.auth-tab.active{background:var(--s3);color:var(--gold)}
-.helper{font-size:.84rem;color:var(--text2);line-height:1.6}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.full{grid-column:1/-1}
-.label{display:block;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:7px}
-.hidden{display:none!important}
-.table-wrap{overflow:auto}
-table{width:100%;border-collapse:collapse;font-size:.88rem}
-th,td{padding:13px 15px;border-bottom:1px solid var(--border);text-align:left}
-th{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);background:var(--s2)}
-tr:hover td{background:rgba(255,255,255,.01)}
-.table-actions{display:flex;gap:8px;flex-wrap:wrap}
-.topic-row{display:grid;grid-template-columns:minmax(0,1fr) 1fr auto;gap:12px;align-items:center;margin-bottom:12px}
-.topic-bar{height:8px;background:var(--s3);border-radius:999px;overflow:hidden}
-.topic-bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:999px}
-.quiz-overlay,.result-overlay,.modal-overlay{display:none;position:fixed;inset:0;z-index:50;background:rgba(6,8,12,.92);backdrop-filter:blur(10px);overflow:auto}
-.quiz-overlay.active,.result-overlay.active,.modal-overlay.active{display:block}
-.quiz-wrap,.result-wrap{max-width:1100px;margin:0 auto;padding:24px}
-.quiz-header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
-.quiz-layout{display:grid;grid-template-columns:220px 1fr;gap:18px}
-.palette,.question-shell{background:var(--s1);border:1px solid var(--border);border-radius:18px}
-.palette{padding:18px}
-.question-shell{padding:24px}
-.palette-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}
-.pal-btn{height:38px;border-radius:10px;border:1px solid var(--border);background:var(--s2);color:var(--text2);cursor:pointer;font-family:var(--mono)}
-.pal-btn.current{border-color:var(--gold);color:var(--gold)}
-.pal-btn.answered{background:rgba(62,207,122,.12);color:var(--green);border-color:rgba(62,207,122,.35)}
-.pal-btn.marked{background:rgba(155,114,245,.14);color:var(--purple);border-color:rgba(155,114,245,.3)}
-.pal-btn.skipped{background:rgba(240,80,80,.08);color:var(--red);border-color:rgba(240,80,80,.28)}
-.question-title{font-family:var(--serif);font-size:clamp(1.05rem,2.4vw,1.3rem);line-height:1.65;margin:12px 0 24px}
-.option-list{display:grid;gap:10px}
-.opt{display:flex;align-items:flex-start;gap:14px;padding:15px 16px;background:var(--s2);border:1px solid var(--border);border-radius:14px;cursor:pointer}
-.opt:hover{border-color:var(--border2)}
-.opt.correct{border-color:rgba(62,207,122,.4);background:rgba(62,207,122,.08)}
-.opt.wrong{border-color:rgba(240,80,80,.4);background:rgba(240,80,80,.08)}
-.opt.reveal{border-color:rgba(62,207,122,.35)}
-.opt-key{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--s3);border:1px solid var(--border2);font-family:var(--mono);font-size:.75rem;flex-shrink:0}
-.explanation{margin-top:18px;padding:18px;border-radius:14px;background:var(--s2);border:1px solid var(--border)}
-.loader{display:none;position:fixed;inset:0;z-index:80;align-items:center;justify-content:center;flex-direction:column;gap:16px;background:rgba(8,10,14,.88)}
-.loader.active{display:flex}
-.spin{width:48px;height:48px;border-radius:50%;border:3px solid var(--border2);border-top-color:var(--gold);animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#toast{display:none;position:fixed;bottom:24px;right:24px;z-index:90;padding:14px 18px;border-radius:12px;border:1px solid var(--border2);background:var(--s2);font-weight:700;max-width:320px}
-#toast.shown{display:block;animation:fade .2s ease}
-#toast.success{color:var(--green)}
-#toast.error{color:var(--red)}
-.drop-zone{padding:38px 24px;text-align:center;border-style:dashed;border-width:2px;cursor:pointer}
-.drop-zone.drag{border-color:var(--gold)}
-.drop-zone input[type=file]{display:none}
-.muted{color:var(--text2)}
-.mono{font-family:var(--mono)}
-.empty{padding:54px 20px;text-align:center;color:var(--text3)}
-.status{display:none;padding:12px 14px;border-radius:12px;margin-bottom:14px}
-.status.shown{display:block}
-.status.ok{background:rgba(62,207,122,.1);border:1px solid rgba(62,207,122,.25);color:var(--green)}
-.status.bad{background:rgba(240,80,80,.1);border:1px solid rgba(240,80,80,.25);color:var(--red)}
-@media (max-width:960px){
-  .two-col,.auth-grid,.quiz-layout{grid-template-columns:1fr}
-  .three-col{grid-template-columns:1fr}
-}
-@media (max-width:700px){
-  nav,.wrap,.hero,.auth-shell,.quiz-wrap,.result-wrap{padding-left:16px;padding-right:16px}
-  .form-grid{grid-template-columns:1fr}
-  .toolbar .input,.toolbar .select{min-width:0;width:100%}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizForge - Smart MCQ Platform</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080a0e;
+      --s1: #0f1219;
+      --s2: #161b25;
+      --s3: #1e2535;
+      --s4: #242c3e;
+      --border: #242b3d;
+      --border2: #2e3850;
+      --gold: #e8b84b;
+      --gold2: #f5d080;
+      --blue: #4a8fff;
+      --green: #3ecf7a;
+      --red: #f05050;
+      --amber: #f0a030;
+      --purple: #9b72f5;
+      --text: #dde2ef;
+      --text2: #8993ac;
+      --text3: #525c73;
+      --font: 'Syne', sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --serif: 'Instrument Serif', serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 40% at 85% 10%, rgba(74, 143, 255, .07) 0%, transparent 60%), radial-gradient(ellipse 40% 30% at 15% 75%, rgba(232, 184, 75, .05) 0%, transparent 60%);
+      pointer-events: none
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8, 10, 14, .88);
+      backdrop-filter: blur(18px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      gap: 16px;
+      flex-wrap: wrap
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.3rem;
+      font-weight: 800
+    }
+
+    .logo-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #080a0e;
+      font-weight: 800
+    }
+
+    .nav-left,
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .nav-tab,
+    .btn,
+    .icon-btn,
+    .input,
+    .select,
+    .textarea {
+      font-family: var(--font)
+    }
+
+    .nav-tab {
+      font-size: .84rem;
+      font-weight: 700;
+      padding: 9px 15px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text2);
+      cursor: pointer
+    }
+
+    .nav-tab:hover,
+    .nav-tab.active {
+      background: var(--s3);
+      border-color: var(--border2);
+      color: var(--gold)
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .08em;
+      text-transform: uppercase
+    }
+
+    .badge.gold {
+      background: rgba(232, 184, 75, .12);
+      border: 1px solid rgba(232, 184, 75, .3);
+      color: var(--gold)
+    }
+
+    .badge.blue {
+      background: rgba(74, 143, 255, .12);
+      border: 1px solid rgba(74, 143, 255, .3);
+      color: var(--blue)
+    }
+
+    .badge.purple {
+      background: rgba(155, 114, 245, .12);
+      border: 1px solid rgba(155, 114, 245, .3);
+      color: var(--purple)
+    }
+
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-weight: 800;
+      font-size: .88rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all .18s
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #080a0e
+    }
+
+    .btn-gold:hover {
+      background: var(--gold2);
+      transform: translateY(-1px)
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text2);
+      border: 1px solid var(--border2)
+    }
+
+    .btn-outline:hover {
+      color: var(--gold);
+      border-color: var(--gold)
+    }
+
+    .btn-purple {
+      background: rgba(155, 114, 245, .16);
+      color: var(--purple);
+      border: 1px solid rgba(155, 114, 245, .35)
+    }
+
+    .btn-purple:hover {
+      background: rgba(155, 114, 245, .24)
+    }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--red);
+      border: 1px solid rgba(240, 80, 80, .35)
+    }
+
+    .btn-danger:hover {
+      background: rgba(240, 80, 80, .08)
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text3);
+      border: 1px solid var(--border)
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--border2);
+      color: var(--text2)
+    }
+
+    .btn-sm {
+      padding: 9px 14px;
+      font-size: .8rem;
+      border-radius: 10px
+    }
+
+    .btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none !important
+    }
+
+    .page {
+      display: none;
+      animation: fade .3s ease
+    }
+
+    .page.active {
+      display: block
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0;
+        transform: translateY(12px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .hero {
+      padding: 72px 24px 40px;
+      max-width: 940px;
+      margin: 0 auto;
+      text-align: center
+    }
+
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(2.5rem, 7vw, 4.4rem);
+      line-height: 1.05;
+      margin-bottom: 18px
+    }
+
+    .hero-title em {
+      color: var(--gold);
+      font-style: italic
+    }
+
+    .hero-sub {
+      max-width: 640px;
+      margin: 0 auto 30px;
+      color: var(--text2);
+      font-size: 1.02rem;
+      line-height: 1.7
+    }
+
+    .hero-actions,
+    .section-actions,
+    .toolbar,
+    .split-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap
+    }
+
+    .hero-actions {
+      justify-content: center
+    }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 24px 52px
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px
+    }
+
+    .title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -.03em
+    }
+
+    .title span {
+      color: var(--gold)
+    }
+
+    .panel,
+    .card,
+    .table-wrap,
+    .empty,
+    .drop-zone {
+      background: var(--s1);
+      border: 1px solid var(--border);
+      border-radius: 18px
+    }
+
+    .panel {
+      padding: 24px
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px
+    }
+
+    .tests-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px
+    }
+
+    .card {
+      padding: 22px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .card>* {
+      position: relative;
+      z-index: 1
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(232, 184, 75, .05), transparent 60%);
+      opacity: 0;
+      transition: opacity .18s;
+      pointer-events: none;
+      z-index: 0
+    }
+
+    .card:hover::before {
+      opacity: 1
+    }
+
+    .card:hover {
+      border-color: var(--border2);
+      transform: translateY(-1px)
+    }
+
+    .card-title {
+      font-size: 1.08rem;
+      font-weight: 800;
+      margin: 10px 0 6px
+    }
+
+    .card-desc {
+      color: var(--text2);
+      font-size: .84rem;
+      line-height: 1.6;
+      min-height: 44px
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 16px 0;
+      font-family: var(--mono);
+      font-size: .73rem;
+      color: var(--text3)
+    }
+
+    .toolbar {
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px
+    }
+
+    .toolbar-left {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      flex: 1
+    }
+
+    .input,
+    .select,
+    .textarea {
+      background: var(--s1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-size: .92rem;
+      outline: none
+    }
+
+    .input:focus,
+    .select:focus,
+    .textarea:focus {
+      border-color: var(--gold)
+    }
+
+    .input,
+    .select {
+      min-height: 46px
+    }
+
+    .textarea {
+      width: 100%;
+      resize: vertical;
+      min-height: 110px;
+      line-height: 1.55
+    }
+
+    .toolbar .input,
+    .toolbar .select {
+      min-width: 220px
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px
+    }
+
+    .stat-card {
+      background: var(--s2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px
+    }
+
+    .stat-val {
+      font-family: var(--mono);
+      font-size: 1.8rem;
+      font-weight: 700
+    }
+
+    .stat-lbl {
+      font-size: .8rem;
+      color: var(--text3);
+      margin-top: 4px
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 18px
+    }
+
+    .three-col {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px
+    }
+
+    .auth-shell {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 30px 24px 50px
+    }
+
+    .auth-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px
+    }
+
+    .auth-tab {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--text2);
+      cursor: pointer;
+      font-weight: 700
+    }
+
+    .auth-tab.active {
+      background: var(--s3);
+      color: var(--gold)
+    }
+
+    .helper {
+      font-size: .84rem;
+      color: var(--text2);
+      line-height: 1.6
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px
+    }
+
+    .full {
+      grid-column: 1/-1
+    }
+
+    .label {
+      display: block;
+      font-family: var(--mono);
+      font-size: .7rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 7px
+    }
+
+    .hidden {
+      display: none !important
+    }
+
+    .table-wrap {
+      overflow: auto
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .88rem
+    }
+
+    th,
+    td {
+      padding: 13px 15px;
+      border-bottom: 1px solid var(--border);
+      text-align: left
+    }
+
+    th {
+      font-family: var(--mono);
+      font-size: .72rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text3);
+      background: var(--s2)
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, .01)
+    }
+
+    .table-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .topic-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 1fr auto;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px
+    }
+
+    .topic-bar {
+      height: 8px;
+      background: var(--s3);
+      border-radius: 999px;
+      overflow: hidden
+    }
+
+    .topic-bar>span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--gold2));
+      border-radius: 999px
+    }
+
+    .quiz-overlay,
+    .result-overlay,
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(6, 8, 12, .92);
+      backdrop-filter: blur(10px);
+      overflow: auto
+    }
+
+    .quiz-overlay.active,
+    .result-overlay.active,
+    .modal-overlay.active {
+      display: block
+    }
+
+    .quiz-wrap,
+    .result-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px
+    }
+
+    .quiz-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px
+    }
+
+    .quiz-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 18px
+    }
+
+    .palette,
+    .question-shell {
+      background: var(--s1);
+      border: 1px solid var(--border);
+      border-radius: 18px
+    }
+
+    .palette {
+      padding: 18px
+    }
+
+    .question-shell {
+      padding: 24px
+    }
+
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin: 14px 0
+    }
+
+    .pal-btn {
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--s2);
+      color: var(--text2);
+      cursor: pointer;
+      font-family: var(--mono)
+    }
+
+    .pal-btn.current {
+      border-color: var(--gold);
+      color: var(--gold)
+    }
+
+    .pal-btn.answered {
+      background: rgba(62, 207, 122, .12);
+      color: var(--green);
+      border-color: rgba(62, 207, 122, .35)
+    }
+
+    .pal-btn.marked {
+      background: rgba(155, 114, 245, .14);
+      color: var(--purple);
+      border-color: rgba(155, 114, 245, .3)
+    }
+
+    .pal-btn.skipped {
+      background: rgba(240, 80, 80, .08);
+      color: var(--red);
+      border-color: rgba(240, 80, 80, .28)
+    }
+
+    .question-title {
+      font-family: var(--serif);
+      font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+      line-height: 1.65;
+      margin: 12px 0 24px
+    }
+
+    .option-list {
+      display: grid;
+      gap: 10px
+    }
+
+    .opt {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 15px 16px;
+      background: var(--s2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      cursor: pointer
+    }
+
+    .opt:hover {
+      border-color: var(--border2)
+    }
+
+    .opt.correct {
+      border-color: rgba(62, 207, 122, .4);
+      background: rgba(62, 207, 122, .08)
+    }
+
+    .opt.wrong {
+      border-color: rgba(240, 80, 80, .4);
+      background: rgba(240, 80, 80, .08)
+    }
+
+    .opt.reveal {
+      border-color: rgba(62, 207, 122, .35)
+    }
+
+    .opt-key {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--s3);
+      border: 1px solid var(--border2);
+      font-family: var(--mono);
+      font-size: .75rem;
+      flex-shrink: 0
+    }
+
+    .explanation {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 14px;
+      background: var(--s2);
+      border: 1px solid var(--border)
+    }
+
+    .loader {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      background: rgba(8, 10, 14, .88)
+    }
+
+    .loader.active {
+      display: flex
+    }
+
+    .spin {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 3px solid var(--border2);
+      border-top-color: var(--gold);
+      animation: spin .8s linear infinite
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    #toast {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 90;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--border2);
+      background: var(--s2);
+      font-weight: 700;
+      max-width: 320px
+    }
+
+    #toast.shown {
+      display: block;
+      animation: fade .2s ease
+    }
+
+    #toast.success {
+      color: var(--green)
+    }
+
+    #toast.error {
+      color: var(--red)
+    }
+
+    .drop-zone {
+      padding: 38px 24px;
+      text-align: center;
+      border-style: dashed;
+      border-width: 2px;
+      cursor: pointer
+    }
+
+    .drop-zone.drag {
+      border-color: var(--gold)
+    }
+
+    .drop-zone input[type=file] {
+      display: none
+    }
+
+    .muted {
+      color: var(--text2)
+    }
+
+    .mono {
+      font-family: var(--mono)
+    }
+
+    .empty {
+      padding: 54px 20px;
+      text-align: center;
+      color: var(--text3)
+    }
+
+    .status {
+      display: none;
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-bottom: 14px
+    }
+
+    .status.shown {
+      display: block
+    }
+
+    .status.ok {
+      background: rgba(62, 207, 122, .1);
+      border: 1px solid rgba(62, 207, 122, .25);
+      color: var(--green)
+    }
+
+    .status.bad {
+      background: rgba(240, 80, 80, .1);
+      border: 1px solid rgba(240, 80, 80, .25);
+      color: var(--red)
+    }
+
+    @media (max-width:960px) {
+
+      .two-col,
+      .auth-grid,
+      .quiz-layout {
+        grid-template-columns: 1fr
+      }
+
+      .three-col {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media (max-width:700px) {
+
+      nav,
+      .wrap,
+      .hero,
+      .auth-shell,
+      .quiz-wrap,
+      .result-wrap {
+        padding-left: 16px;
+        padding-right: 16px
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr
+      }
+
+      .toolbar .input,
+      .toolbar .select {
+        min-width: 0;
+        width: 100%
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="app">
-  <nav>
-    <div class="nav-left">
-      <div class="logo"><div class="logo-icon">Q</div>QuizForge</div>
-      <button class="nav-tab active" data-page="home">Tests</button>
-      <button class="nav-tab hidden" data-page="dashboard" data-auth-only="1">Dashboard</button>
-      <button class="nav-tab hidden" data-page="upload" data-admin-only="1">Upload</button>
-      <button class="nav-tab hidden" data-page="history" data-auth-only="1">History</button>
-      <button class="nav-tab hidden" data-page="profile" data-auth-only="1">Profile</button>
-      <button class="nav-tab hidden" data-page="admin" data-admin-only="1">Admin</button>
-    </div>
-    <div class="nav-right" id="nav-auth"></div>
-  </nav>
-
-  <section id="page-home" class="page active">
-    <div class="hero">
-      <div class="badge gold">MCQ Test Platform</div>
-      <h1 class="hero-title">Master any subject<br>with <em>focused testing.</em></h1>
-      <p class="hero-sub">Secure user accounts, personal performance dashboards, topic analytics, and an admin workspace for managing tests, questions, and users.</p>
-      <div class="hero-actions" id="hero-actions"></div>
-    </div>
-    <div class="wrap">
-      <div class="section-head">
-        <h2 class="title">Available <span>Tests</span></h2>
-        <div class="section-actions">
-          <button class="btn btn-outline btn-sm" onclick="loadTests()">Refresh</button>
+  <div class="app">
+    <nav>
+      <div class="nav-left">
+        <div class="logo">
+          <div class="logo-icon">Q</div>QuizForge
         </div>
+        <button class="nav-tab active" data-page="home">Tests</button>
+        <button class="nav-tab hidden" data-page="dashboard" data-auth-only="1">Dashboard</button>
+        <button class="nav-tab hidden" data-page="upload" data-admin-only="1">Upload</button>
+        <button class="nav-tab hidden" data-page="history" data-auth-only="1">History</button>
+        <button class="nav-tab hidden" data-page="profile" data-auth-only="1">Profile</button>
+        <button class="nav-tab hidden" data-page="admin" data-admin-only="1">Admin</button>
       </div>
-      <div class="toolbar">
-        <div class="toolbar-left">
-          <input class="input" id="test-search" placeholder="Search by title, subject, or description" oninput="renderTests()">
-          <select class="select" id="topic-filter" onchange="renderTests()"><option value="all">All subjects</option></select>
-        </div>
-        <div class="mono muted" id="tests-summary">0 tests</div>
-      </div>
-      <div class="tests-grid" id="tests-grid"></div>
-    </div>
-  </section>
+      <div class="nav-right" id="nav-auth"></div>
+    </nav>
 
-  <section id="page-dashboard" class="page">
-    <div class="wrap">
-      <div class="section-head"><h2 class="title">Your <span>Dashboard</span></h2></div>
-      <div class="stats-grid" id="dashboard-stats"></div>
-      <div class="two-col" style="margin-top:18px">
-        <div class="panel">
-          <div class="section-head"><h3 class="title" style="font-size:1.05rem">Topic Strength</h3></div>
-          <div id="dashboard-topics"></div>
-        </div>
-        <div class="panel">
-          <div class="section-head"><h3 class="title" style="font-size:1.05rem">Recent Attempts</h3></div>
-          <div id="dashboard-recent"></div>
-        </div>
+    <section id="page-home" class="page active">
+      <div class="hero">
+        <div class="badge gold">MCQ Test Platform</div>
+        <h1 class="hero-title">Master any subject<br>with <em>focused testing.</em></h1>
+        <p class="hero-sub">Secure user accounts, personal performance dashboards, topic analytics, and an admin
+          workspace for managing tests, questions, and users.</p>
+        <div class="hero-actions" id="hero-actions"></div>
       </div>
-    </div>
-  </section>
-
-  <section id="page-upload" class="page">
-    <div class="wrap">
-      <div class="panel">
-        <div class="section-head"><h2 class="title">Admin <span>Upload</span></h2><span class="badge purple">Admin Only</span></div>
-        <div class="helper" style="margin-bottom:16px">Upload a whole subject or test as one JSON file. New tests are created under the currently logged-in admin account.</div>
-        <div class="status" id="upload-status"></div>
-        <div class="form-grid">
-          <div class="full">
-            <label class="label">Default Title</label>
-            <input class="input" id="up-title" placeholder="Optional override">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 class="title">Available <span>Tests</span></h2>
+          <div class="section-actions">
+            <button class="btn btn-outline btn-sm" onclick="loadTests()">Refresh</button>
           </div>
-          <div class="full">
-            <label class="label">Description</label>
-            <textarea class="textarea" id="up-desc" placeholder="Optional description override"></textarea>
-          </div>
-          <div>
-            <label class="label">Primary Topic</label>
-            <input class="input" id="up-topic" placeholder="Java, SQL, DSA...">
-          </div>
-          <div>
-            <label class="label">Time Per Question</label>
-            <select class="select" id="up-tpq">
-              <option value="30">30 sec</option>
-              <option value="60" selected>60 sec</option>
-              <option value="90">90 sec</option>
-              <option value="120">120 sec</option>
-              <option value="0">No timer</option>
+        </div>
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <input class="input" id="test-search" placeholder="Search by title, subject, or description"
+              oninput="renderTests()">
+            <select class="select" id="topic-filter" onchange="renderTests()">
+              <option value="all">All subjects</option>
             </select>
           </div>
+          <div class="mono muted" id="tests-summary">0 tests</div>
         </div>
-        <div class="panel" style="margin-top:18px;padding:18px">
-          <div class="badge blue" style="margin-bottom:10px">JSON Format</div>
-          <pre>{
+        <div class="tests-grid" id="tests-grid"></div>
+      </div>
+    </section>
+
+    <section id="page-dashboard" class="page">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 class="title">Your <span>Dashboard</span></h2>
+        </div>
+        <div class="stats-grid" id="dashboard-stats"></div>
+        <div class="two-col" style="margin-top:18px">
+          <div class="panel">
+            <div class="section-head">
+              <h3 class="title" style="font-size:1.05rem">Topic Strength</h3>
+            </div>
+            <div id="dashboard-topics"></div>
+          </div>
+          <div class="panel">
+            <div class="section-head">
+              <h3 class="title" style="font-size:1.05rem">Recent Attempts</h3>
+            </div>
+            <div id="dashboard-recent"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-upload" class="page">
+      <div class="wrap">
+        <div class="panel">
+          <div class="section-head">
+            <h2 class="title">Admin <span>Upload</span></h2><span class="badge purple">Admin Only</span>
+          </div>
+          <div class="helper" style="margin-bottom:16px">Upload a whole subject or test as one JSON file. New tests are
+            created under the currently logged-in admin account.</div>
+          <div class="status" id="upload-status"></div>
+          <div class="form-grid">
+            <div class="full">
+              <label class="label">Default Title</label>
+              <input class="input" id="up-title" placeholder="Optional override">
+            </div>
+            <div class="full">
+              <label class="label">Description</label>
+              <textarea class="textarea" id="up-desc" placeholder="Optional description override"></textarea>
+            </div>
+            <div>
+              <label class="label">Primary Topic</label>
+              <input class="input" id="up-topic" placeholder="Java, SQL, DSA...">
+            </div>
+            <div>
+              <label class="label">Time Per Question</label>
+              <select class="select" id="up-tpq">
+                <option value="30">30 sec</option>
+                <option value="60" selected>60 sec</option>
+                <option value="90">90 sec</option>
+                <option value="120">120 sec</option>
+                <option value="0">No timer</option>
+              </select>
+            </div>
+          </div>
+          <div class="panel" style="margin-top:18px;padding:18px">
+            <div class="badge blue" style="margin-bottom:10px">JSON Format</div>
+            <pre>{
   "title": "Java OOP - Chapter 4",
   "subject": "Java",
   "description": "Inheritance and interfaces",
@@ -252,135 +1035,182 @@ tr:hover td{background:rgba(255,255,255,.01)}
     }
   ]
 }</pre>
-        </div>
-        <label class="drop-zone" id="drop-zone">
-          <input type="file" id="json-file" accept=".json" multiple>
-          <div style="font-size:2rem;margin-bottom:10px">Folder</div>
-          <div style="font-size:1rem;font-weight:800;margin-bottom:6px">Drop JSON files here</div>
-          <div class="muted">or click to browse · .json · multiple files supported</div>
-        </label>
-        <div id="file-queue" class="grid" style="margin-top:16px;display:none"></div>
-        <div class="split-actions" style="margin-top:16px">
-          <button class="btn btn-gold" id="up-btn" onclick="submitUpload()" disabled>Upload All</button>
-          <button class="btn btn-ghost" id="up-clear-btn" onclick="clearAllFiles()" style="display:none">Clear</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="page-history" class="page">
-    <div class="wrap">
-      <div class="section-head"><h2 class="title">Your <span>History</span></h2><button class="btn btn-outline btn-sm" onclick="loadHistory()">Refresh</button></div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Test</th><th>Topic</th><th>Score</th><th>Correct</th><th>Wrong</th><th>Skipped</th><th>Time</th><th>Date</th></tr></thead>
-          <tbody id="history-body"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <section id="page-profile" class="page">
-    <div class="wrap">
-      <div class="two-col">
-        <div class="panel">
-          <div class="section-head"><h2 class="title">User <span>Profile</span></h2></div>
-          <div id="profile-card"></div>
-        </div>
-        <div class="panel">
-          <div class="section-head"><h2 class="title">Change <span>Password</span></h2></div>
-          <div class="status" id="change-pass-status"></div>
-          <div class="grid">
-            <div>
-              <label class="label">Current Password</label>
-              <input class="input" id="current-password" type="password">
-            </div>
-            <div>
-              <label class="label">New Password</label>
-              <input class="input" id="new-password" type="password">
-            </div>
-            <button class="btn btn-gold" onclick="changePassword()">Update Password</button>
+          </div>
+          <label class="drop-zone" id="drop-zone">
+            <input type="file" id="json-file" accept=".json" multiple>
+            <div style="font-size:2rem;margin-bottom:10px">Folder</div>
+            <div style="font-size:1rem;font-weight:800;margin-bottom:6px">Drop JSON files here</div>
+            <div class="muted">or click to browse · .json · multiple files supported</div>
+          </label>
+          <div id="file-queue" class="grid" style="margin-top:16px;display:none"></div>
+          <div class="split-actions" style="margin-top:16px">
+            <button class="btn btn-gold" id="up-btn" onclick="submitUpload()" disabled>Upload All</button>
+            <button class="btn btn-ghost" id="up-clear-btn" onclick="clearAllFiles()"
+              style="display:none">Clear</button>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="page-admin" class="page">
-    <div class="wrap">
-      <div class="section-head"><h2 class="title">Admin <span>Control</span></h2><span class="badge purple">Users, Tests, Questions</span></div>
-      <div class="stats-grid" id="admin-stats"></div>
-      <div class="two-col" style="margin-top:18px">
-        <div class="panel">
-          <div class="section-head"><h3 class="title" style="font-size:1.05rem">Manage Users</h3></div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Attempts</th><th>Actions</th></tr></thead>
-              <tbody id="admin-users-body"></tbody>
-            </table>
-          </div>
-        </div>
-        <div class="panel">
-          <div class="section-head"><h3 class="title" style="font-size:1.05rem">Manage Tests</h3></div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Test</th><th>Creator</th><th>Questions</th><th>Actions</th></tr></thead>
-              <tbody id="admin-tests-body"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="panel hidden" id="question-editor-panel" style="margin-top:18px">
+    <section id="page-history" class="page">
+      <div class="wrap">
         <div class="section-head">
-          <h3 class="title" style="font-size:1.05rem">Question <span>Editor</span></h3>
-          <div class="split-actions">
-            <span class="mono muted" id="editor-test-label"></span>
-            <button class="btn btn-ghost btn-sm" onclick="closeQuestionEditor()">Close</button>
-          </div>
+          <h2 class="title">Your <span>History</span></h2><button class="btn btn-outline btn-sm"
+            onclick="loadHistory()">Refresh</button>
         </div>
-        <div class="status" id="editor-status"></div>
-        <div class="form-grid">
-          <input type="hidden" id="editor-test-id">
-          <input type="hidden" id="editor-question-id">
-          <div class="full">
-            <label class="label">Topic</label>
-            <input class="input" id="editor-topic">
-          </div>
-          <div class="full">
-            <label class="label">Question</label>
-            <textarea class="textarea" id="editor-question"></textarea>
-          </div>
-          <div class="full">
-            <label class="label">Options (one per line)</label>
-            <textarea class="textarea" id="editor-options"></textarea>
-          </div>
-          <div>
-            <label class="label">Correct Answer</label>
-            <input class="input" id="editor-answer">
-          </div>
-          <div>
-            <label class="label">Explanation</label>
-            <input class="input" id="editor-explanation">
-          </div>
-          <div class="full split-actions">
-            <button class="btn btn-gold" onclick="saveQuestion()">Save Question</button>
-            <button class="btn btn-outline" onclick="clearQuestionForm()">New Question</button>
-          </div>
-        </div>
-        <div class="table-wrap" style="margin-top:18px">
+        <div class="table-wrap">
           <table>
-            <thead><tr><th>#</th><th>Topic</th><th>Question</th><th>Actions</th></tr></thead>
-            <tbody id="editor-questions-body"></tbody>
+            <thead>
+              <tr>
+                <th>Test</th>
+                <th>Topic</th>
+                <th>Score</th>
+                <th>Correct</th>
+                <th>Wrong</th>
+                <th>Skipped</th>
+                <th>Time</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="history-body"></tbody>
           </table>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <div class="modal-overlay" id="auth-modal">
-    <div class="wrap" style="max-width:980px">
-      <div class="auth-grid">
-        <!-- <div class="panel">
+    <section id="page-profile" class="page">
+      <div class="wrap">
+        <div class="two-col">
+          <div class="panel">
+            <div class="section-head">
+              <h2 class="title">User <span>Profile</span></h2>
+            </div>
+            <div id="profile-card"></div>
+          </div>
+          <div class="panel">
+            <div class="section-head">
+              <h2 class="title">Change <span>Password</span></h2>
+            </div>
+            <div class="status" id="change-pass-status"></div>
+            <div class="grid">
+              <div>
+                <label class="label">Current Password</label>
+                <input class="input" id="current-password" type="password">
+              </div>
+              <div>
+                <label class="label">New Password</label>
+                <input class="input" id="new-password" type="password">
+              </div>
+              <button class="btn btn-gold" onclick="changePassword()">Update Password</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-admin" class="page">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 class="title">Admin <span>Control</span></h2><span class="badge purple">Users, Tests, Questions</span>
+        </div>
+        <div class="stats-grid" id="admin-stats"></div>
+        <div class="two-col" style="margin-top:18px">
+          <div class="panel">
+            <div class="section-head">
+              <h3 class="title" style="font-size:1.05rem">Manage Users</h3>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Attempts</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="section-head">
+              <h3 class="title" style="font-size:1.05rem">Manage Tests</h3>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Test</th>
+                    <th>Creator</th>
+                    <th>Questions</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-tests-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="panel hidden" id="question-editor-panel" style="margin-top:18px">
+          <div class="section-head">
+            <h3 class="title" style="font-size:1.05rem">Question <span>Editor</span></h3>
+            <div class="split-actions">
+              <span class="mono muted" id="editor-test-label"></span>
+              <button class="btn btn-ghost btn-sm" onclick="closeQuestionEditor()">Close</button>
+            </div>
+          </div>
+          <div class="status" id="editor-status"></div>
+          <div class="form-grid">
+            <input type="hidden" id="editor-test-id">
+            <input type="hidden" id="editor-question-id">
+            <div class="full">
+              <label class="label">Topic</label>
+              <input class="input" id="editor-topic">
+            </div>
+            <div class="full">
+              <label class="label">Question</label>
+              <textarea class="textarea" id="editor-question"></textarea>
+            </div>
+            <div class="full">
+              <label class="label">Options (one per line)</label>
+              <textarea class="textarea" id="editor-options"></textarea>
+            </div>
+            <div>
+              <label class="label">Correct Answer</label>
+              <input class="input" id="editor-answer">
+            </div>
+            <div>
+              <label class="label">Explanation</label>
+              <input class="input" id="editor-explanation">
+            </div>
+            <div class="full split-actions">
+              <button class="btn btn-gold" onclick="saveQuestion()">Save Question</button>
+              <button class="btn btn-outline" onclick="clearQuestionForm()">New Question</button>
+            </div>
+          </div>
+          <div class="table-wrap" style="margin-top:18px">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Topic</th>
+                  <th>Question</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="editor-questions-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="modal-overlay" id="auth-modal">
+      <div class="wrap" style="max-width:980px">
+        <div class="auth-grid">
+          <!-- <div class="panel">
           <div class="badge gold" style="margin-bottom:12px">Secure Learning</div>
           <h2 class="title" style="font-size:2rem;margin-bottom:10px">Sign in to track every attempt.</h2>
           <p class="helper">Create an account to keep your own test history, topic analytics, profile stats, and dashboard progress. Admin users can manage tests, questions, and users from the same interface.</p>
@@ -390,329 +1220,356 @@ tr:hover td{background:rgba(255,255,255,.01)}
             <div class="stat-card"><div class="stat-val">Analytics</div><div class="stat-lbl">Topic strengths and history</div></div>
           </div>
         </div> -->
-        <div class="panel">
-          <div class="section-head"><h2 class="title">Account <span>Access</span></h2><button class="btn btn-ghost btn-sm" onclick="closeAuth()">Close</button></div>
-          <div class="auth-tabs">
-            <button class="auth-tab active" data-auth-view="login">Login</button>
-            <button class="auth-tab" data-auth-view="register">Register</button>
-            <button class="auth-tab" data-auth-view="reset">Reset Password</button>
-          </div>
-          <div class="status" id="auth-status"></div>
-          <div id="auth-login" class="auth-view">
-            <div class="grid">
-              <div><label class="label">Email</label><input class="input" id="login-email" type="email"></div>
-              <div><label class="label">Password</label><input class="input" id="login-password" type="password"></div>
-              <button class="btn btn-gold" onclick="login()">Login</button>
+          <div class="panel">
+            <div class="section-head">
+              <h2 class="title">Account <span>Access</span></h2><button class="btn btn-ghost btn-sm"
+                onclick="closeAuth()">Close</button>
+            </div>
+            <div class="auth-tabs">
+              <button class="auth-tab active" data-auth-view="login">Login</button>
+              <button class="auth-tab" data-auth-view="register">Register</button>
+              <button class="auth-tab" data-auth-view="reset">Reset Password</button>
+            </div>
+            <div class="status" id="auth-status"></div>
+            <div id="auth-login" class="auth-view">
+              <div class="grid">
+                <div><label class="label">Email</label><input class="input" id="login-email" type="email"></div>
+                <div><label class="label">Password</label><input class="input" id="login-password" type="password">
+                </div>
+                <button class="btn btn-gold" onclick="login()">Login</button>
+              </div>
+            </div>
+            <div id="auth-register" class="auth-view hidden">
+              <div class="grid">
+                <div><label class="label">Full Name</label><input class="input" id="register-name"></div>
+                <div><label class="label">Email</label><input class="input" id="register-email" type="email"></div>
+                <div class="full"><label class="label">Password</label><input class="input" id="register-password"
+                    type="password"></div>
+                <button class="btn btn-gold" onclick="register()">Create Account</button>
+              </div>
+            </div>
+            <div id="auth-reset" class="auth-view hidden">
+              <div class="grid">
+                <div class="full"><label class="label">Email</label><input class="input" id="reset-email" type="email">
+                </div>
+                <button class="btn btn-outline" onclick="requestReset()">Generate Reset Token</button>
+                <div class="full"><label class="label">Reset Token</label><input class="input" id="reset-token"></div>
+                <div class="full"><label class="label">New Password</label><input class="input" id="reset-password"
+                    type="password"></div>
+                <button class="btn btn-gold" onclick="resetPassword()">Reset Password</button>
+              </div>
             </div>
           </div>
-          <div id="auth-register" class="auth-view hidden">
-            <div class="grid">
-              <div><label class="label">Full Name</label><input class="input" id="register-name"></div>
-              <div><label class="label">Email</label><input class="input" id="register-email" type="email"></div>
-              <div class="full"><label class="label">Password</label><input class="input" id="register-password" type="password"></div>
-              <button class="btn btn-gold" onclick="register()">Create Account</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-overlay" id="quiz-overlay">
+      <div class="quiz-wrap">
+        <div class="quiz-header">
+          <div>
+            <div class="badge purple" id="quiz-mode-badge">Live Test</div>
+            <div class="title" style="font-size:1.1rem;margin-top:8px" id="qt-name">Test</div>
+          </div>
+          <div class="mono muted" id="qt-counter">Q 1 / 1</div>
+          <div class="mono muted" id="qt-answered">0 answered</div>
+          <div class="mono muted" id="timer-text">60 sec</div>
+          <button class="btn btn-ghost btn-sm" onclick="openFinishModal()">Finish</button>
+        </div>
+        <div class="quiz-layout">
+          <div class="palette">
+            <div class="badge gold">Questions</div>
+            <div class="palette-grid" id="palette-grid"></div>
+          </div>
+          <div class="question-shell">
+            <div class="badge blue" id="qm-topic">Topic</div>
+            <div class="question-title" id="qm-text"></div>
+            <div class="option-list" id="options-list"></div>
+            <div class="explanation hidden" id="expl-card">
+              <div style="font-weight:800;margin-bottom:8px" id="expl-head"></div>
+              <div class="mono muted" id="expl-answer" style="margin-bottom:8px"></div>
+              <div id="expl-text" class="muted"></div>
+            </div>
+            <div class="split-actions" style="margin-top:18px">
+              <button class="btn btn-purple btn-sm" id="mark-btn" onclick="toggleMark()">Mark for Review</button>
+              <button class="btn btn-ghost btn-sm" id="skip-btn" onclick="skipQuestion()">Skip</button>
+              <button class="btn btn-gold btn-sm hidden" id="next-btn" onclick="nextQuestion()">Next</button>
+              <button class="btn btn-gold btn-sm hidden" id="finish-now-btn" onclick="openFinishModal()">Finish
+                Test</button>
             </div>
           </div>
-          <div id="auth-reset" class="auth-view hidden">
-            <div class="grid">
-              <div class="full"><label class="label">Email</label><input class="input" id="reset-email" type="email"></div>
-              <button class="btn btn-outline" onclick="requestReset()">Generate Reset Token</button>
-              <div class="full"><label class="label">Reset Token</label><input class="input" id="reset-token"></div>
-              <div class="full"><label class="label">New Password</label><input class="input" id="reset-password" type="password"></div>
-              <button class="btn btn-gold" onclick="resetPassword()">Reset Password</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="finish-modal">
+      <div class="wrap" style="max-width:500px;padding-top:70px">
+        <div class="panel">
+          <h3 class="title" style="font-size:1.2rem;margin-bottom:10px">Submit Test?</h3>
+          <p class="helper" style="margin-bottom:18px">Review your current progress before finishing the test.</p>
+          <div class="stats-grid" style="margin-bottom:18px">
+            <div class="stat-card">
+              <div class="stat-val" id="ms-answered">0</div>
+              <div class="stat-lbl">Answered</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-val" id="ms-marked">0</div>
+              <div class="stat-lbl">Marked</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-val" id="ms-unanswered">0</div>
+              <div class="stat-lbl">Unanswered</div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="quiz-overlay" id="quiz-overlay">
-    <div class="quiz-wrap">
-      <div class="quiz-header">
-        <div><div class="badge purple" id="quiz-mode-badge">Live Test</div><div class="title" style="font-size:1.1rem;margin-top:8px" id="qt-name">Test</div></div>
-        <div class="mono muted" id="qt-counter">Q 1 / 1</div>
-        <div class="mono muted" id="qt-answered">0 answered</div>
-        <div class="mono muted" id="timer-text">60 sec</div>
-        <button class="btn btn-ghost btn-sm" onclick="openFinishModal()">Finish</button>
-      </div>
-      <div class="quiz-layout">
-        <div class="palette">
-          <div class="badge gold">Questions</div>
-          <div class="palette-grid" id="palette-grid"></div>
-        </div>
-        <div class="question-shell">
-          <div class="badge blue" id="qm-topic">Topic</div>
-          <div class="question-title" id="qm-text"></div>
-          <div class="option-list" id="options-list"></div>
-          <div class="explanation hidden" id="expl-card">
-            <div style="font-weight:800;margin-bottom:8px" id="expl-head"></div>
-            <div class="mono muted" id="expl-answer" style="margin-bottom:8px"></div>
-            <div id="expl-text" class="muted"></div>
-          </div>
-          <div class="split-actions" style="margin-top:18px">
-            <button class="btn btn-purple btn-sm" id="mark-btn" onclick="toggleMark()">Mark for Review</button>
-            <button class="btn btn-ghost btn-sm" id="skip-btn" onclick="skipQuestion()">Skip</button>
-            <button class="btn btn-gold btn-sm hidden" id="next-btn" onclick="nextQuestion()">Next</button>
-            <button class="btn btn-gold btn-sm hidden" id="finish-now-btn" onclick="openFinishModal()">Finish Test</button>
+          <div class="split-actions">
+            <button class="btn btn-ghost" onclick="closeFinishModal()">Continue</button>
+            <button class="btn btn-gold" onclick="submitTest()">Submit Now</button>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="modal-overlay" id="finish-modal">
-    <div class="wrap" style="max-width:500px;padding-top:70px">
-      <div class="panel">
-        <h3 class="title" style="font-size:1.2rem;margin-bottom:10px">Submit Test?</h3>
-        <p class="helper" style="margin-bottom:18px">Review your current progress before finishing the test.</p>
-        <div class="stats-grid" style="margin-bottom:18px">
-          <div class="stat-card"><div class="stat-val" id="ms-answered">0</div><div class="stat-lbl">Answered</div></div>
-          <div class="stat-card"><div class="stat-val" id="ms-marked">0</div><div class="stat-lbl">Marked</div></div>
-          <div class="stat-card"><div class="stat-val" id="ms-unanswered">0</div><div class="stat-lbl">Unanswered</div></div>
+    <div class="result-overlay" id="result-overlay">
+      <div class="result-wrap">
+        <div class="panel" style="text-align:center;margin-bottom:18px">
+          <div class="badge gold">Performance Snapshot</div>
+          <div class="hero-title" style="font-size:clamp(2.6rem,8vw,5rem);margin:16px 0 8px" id="r-score">0%</div>
+          <div class="muted" id="r-raw">0 correct</div>
+          <div class="title" style="font-size:1.25rem;margin-top:12px" id="r-title">Well done</div>
+          <div class="muted" id="r-sub">Review your topic performance below.</div>
         </div>
-        <div class="split-actions">
-          <button class="btn btn-ghost" onclick="closeFinishModal()">Continue</button>
-          <button class="btn btn-gold" onclick="submitTest()">Submit Now</button>
+        <div class="stats-grid" id="result-stats"></div>
+        <div class="two-col" style="margin-top:18px">
+          <div class="panel">
+            <div class="section-head">
+              <h3 class="title" style="font-size:1.05rem">Topic Breakdown</h3>
+            </div>
+            <div id="topics-breakdown"></div>
+          </div>
+          <div class="panel">
+            <div class="section-head">
+              <h3 class="title" style="font-size:1.05rem">Question Log</h3>
+            </div>
+            <div id="result-log" class="grid"></div>
+          </div>
+        </div>
+        <div class="split-actions" style="margin-top:18px;justify-content:center">
+          <button class="btn btn-ghost" id="r-retake-btn" onclick="retakeTest()">Retake</button>
+          <button class="btn btn-outline" onclick="backToHome()">Back to Tests</button>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="result-overlay" id="result-overlay">
-    <div class="result-wrap">
-      <div class="panel" style="text-align:center;margin-bottom:18px">
-        <div class="badge gold">Performance Snapshot</div>
-        <div class="hero-title" style="font-size:clamp(2.6rem,8vw,5rem);margin:16px 0 8px" id="r-score">0%</div>
-        <div class="muted" id="r-raw">0 correct</div>
-        <div class="title" style="font-size:1.25rem;margin-top:12px" id="r-title">Well done</div>
-        <div class="muted" id="r-sub">Review your topic performance below.</div>
-      </div>
-      <div class="stats-grid" id="result-stats"></div>
-      <div class="two-col" style="margin-top:18px">
-        <div class="panel">
-          <div class="section-head"><h3 class="title" style="font-size:1.05rem">Topic Breakdown</h3></div>
-          <div id="topics-breakdown"></div>
-        </div>
-        <div class="panel">
-          <div class="section-head"><h3 class="title" style="font-size:1.05rem">Question Log</h3></div>
-          <div id="result-log" class="grid"></div>
-        </div>
-      </div>
-      <div class="split-actions" style="margin-top:18px;justify-content:center">
-        <button class="btn btn-ghost" id="r-retake-btn" onclick="retakeTest()">Retake</button>
-        <button class="btn btn-outline" onclick="backToHome()">Back to Tests</button>
-      </div>
+    <div class="loader" id="loader">
+      <div class="spin"></div>
+      <div class="muted" id="loader-text">Loading...</div>
     </div>
+    <div id="toast"></div>
   </div>
 
-  <div class="loader" id="loader"><div class="spin"></div><div class="muted" id="loader-text">Loading...</div></div>
-  <div id="toast"></div>
-</div>
+  <script>
+    const API = './api.php';
 
-<script>
-const API = './api.php';
+    let authToken = localStorage.getItem('quizforge_token') || '';
+    let currentUser = JSON.parse(localStorage.getItem('quizforge_user') || 'null');
+    let allTests = [];
+    let fileQueue = [];
+    let currentTest = null;
+    let questions = [];
+    let qStates = [];
+    let qIndex = 0;
+    let isRandom = false;
+    let timeLeft = 60;
+    let timerInterval = null;
+    let startTime = null;
+    let adminEditorQuestions = [];
+    let busyTestAction = null;
 
-let authToken = localStorage.getItem('quizforge_token') || '';
-let currentUser = JSON.parse(localStorage.getItem('quizforge_user') || 'null');
-let allTests = [];
-let fileQueue = [];
-let currentTest = null;
-let questions = [];
-let qStates = [];
-let qIndex = 0;
-let isRandom = false;
-let timeLeft = 60;
-let timerInterval = null;
-let startTime = null;
-let adminEditorQuestions = [];
-let busyTestAction = null;
+    const navTabs = [...document.querySelectorAll('.nav-tab[data-page]')];
+    navTabs.forEach(tab => tab.addEventListener('click', () => showPage(tab.dataset.page)));
+    document.querySelectorAll('.auth-tab').forEach(btn => btn.addEventListener('click', () => switchAuthView(btn.dataset.authView)));
 
-const navTabs = [...document.querySelectorAll('.nav-tab[data-page]')];
-navTabs.forEach(tab => tab.addEventListener('click', () => showPage(tab.dataset.page)));
-document.querySelectorAll('.auth-tab').forEach(btn => btn.addEventListener('click', () => switchAuthView(btn.dataset.authView)));
+    async function api(action, data = {}, options = {}) {
+      const headers = { 'Content-Type': 'application/json' };
+      if (authToken) headers.Authorization = `Bearer ${authToken}`;
+      const url = options.query ? `${API}?${new URLSearchParams({ action, ...options.query })}` : API;
+      const response = await fetch(url, {
+        method: options.method || 'POST',
+        headers,
+        body: options.method === 'GET' ? null : JSON.stringify({ action, ...data })
+      });
+      const result = await response.json();
+      if ((response.status === 401 || response.status === 403) && !options.silentAuth) {
+        if (response.status === 401) clearAuth(true);
+      }
+      return result;
+    }
 
-async function api(action, data = {}, options = {}) {
-  const headers = {'Content-Type': 'application/json'};
-  if (authToken) headers.Authorization = `Bearer ${authToken}`;
-  const url = options.query ? `${API}?${new URLSearchParams({action, ...options.query})}` : API;
-  const response = await fetch(url, {
-    method: options.method || 'POST',
-    headers,
-    body: options.method === 'GET' ? null : JSON.stringify({action, ...data})
-  });
-  const result = await response.json();
-  if ((response.status === 401 || response.status === 403) && !options.silentAuth) {
-    if (response.status === 401) clearAuth(true);
-  }
-  return result;
-}
+    function esc(s) { return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+    function fmtDate(value) { if (!value) return '-'; return new Date(value).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); }
+    function fmtPct(correct, total) { return total ? Math.round((correct / total) * 100) : 0; }
+    function showLoader(msg = 'Loading...') { document.getElementById('loader-text').textContent = msg; document.getElementById('loader').classList.add('active'); }
+    function hideLoader() { document.getElementById('loader').classList.remove('active'); }
+    function toast(msg, type = 'success') { const el = document.getElementById('toast'); el.textContent = msg; el.className = `shown ${type}`; setTimeout(() => el.className = '', 3200); }
+    function showStatus(id, msg, type) { const el = document.getElementById(id); el.textContent = msg; el.className = `status shown ${type}`; }
+    function clearStatus(id) { const el = document.getElementById(id); el.textContent = ''; el.className = 'status'; }
 
-function esc(s){return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function fmtDate(value){if(!value)return '-';return new Date(value).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}
-function fmtPct(correct,total){return total ? Math.round((correct/total)*100) : 0;}
-function showLoader(msg='Loading...'){document.getElementById('loader-text').textContent = msg;document.getElementById('loader').classList.add('active');}
-function hideLoader(){document.getElementById('loader').classList.remove('active');}
-function toast(msg,type='success'){const el=document.getElementById('toast');el.textContent=msg;el.className=`shown ${type}`;setTimeout(()=>el.className='',3200);}
-function showStatus(id,msg,type){const el=document.getElementById(id);el.textContent=msg;el.className=`status shown ${type}`;}
-function clearStatus(id){const el=document.getElementById(id);el.textContent='';el.className='status';}
+    function persistAuth(payload) {
+      authToken = payload.token;
+      currentUser = payload.user;
+      localStorage.setItem('quizforge_token', authToken);
+      localStorage.setItem('quizforge_user', JSON.stringify(currentUser));
+      renderAuthNav();
+    }
 
-function persistAuth(payload){
-  authToken = payload.token;
-  currentUser = payload.user;
-  localStorage.setItem('quizforge_token', authToken);
-  localStorage.setItem('quizforge_user', JSON.stringify(currentUser));
-  renderAuthNav();
-}
+    function clearAuth(silent = false) {
+      authToken = '';
+      currentUser = null;
+      localStorage.removeItem('quizforge_token');
+      localStorage.removeItem('quizforge_user');
+      renderAuthNav();
+      if (!silent) toast('Logged out', 'success');
+    }
 
-function clearAuth(silent=false){
-  authToken = '';
-  currentUser = null;
-  localStorage.removeItem('quizforge_token');
-  localStorage.removeItem('quizforge_user');
-  renderAuthNav();
-  if(!silent) toast('Logged out','success');
-}
-
-function renderAuthNav(){
-  const nav = document.getElementById('nav-auth');
-  const heroActions = document.getElementById('hero-actions');
-  const isAdmin = currentUser?.role === 'admin';
-  document.querySelectorAll('[data-auth-only="1"]').forEach(el=>el.classList.toggle('hidden', !currentUser));
-  document.querySelectorAll('[data-admin-only="1"]').forEach(el=>el.classList.toggle('hidden', !isAdmin));
-  if(currentUser){
-    nav.innerHTML = `
+    function renderAuthNav() {
+      const nav = document.getElementById('nav-auth');
+      const heroActions = document.getElementById('hero-actions');
+      const isAdmin = currentUser?.role === 'admin';
+      document.querySelectorAll('[data-auth-only="1"]').forEach(el => el.classList.toggle('hidden', !currentUser));
+      document.querySelectorAll('[data-admin-only="1"]').forEach(el => el.classList.toggle('hidden', !isAdmin));
+      if (currentUser) {
+        nav.innerHTML = `
       <span class="badge ${isAdmin ? 'purple' : 'blue'}">${esc(currentUser.role)}</span>
       <span class="mono muted">${esc(currentUser.name)}</span>
       <button class="btn btn-outline btn-sm" onclick="showPage('profile')">Profile</button>
       <button class="btn btn-ghost btn-sm" onclick="logout()">Logout</button>`;
-    heroActions.innerHTML = `
+        heroActions.innerHTML = `
       <button class="btn btn-gold" onclick="showPage('dashboard')">Open Dashboard</button>
       <button class="btn btn-purple" onclick="showPage('history')">View History</button>
       <button class="btn btn-outline" onclick="document.getElementById('tests-grid').scrollIntoView({behavior:'smooth',block:'start'})">Explore Tests</button>`;
-  } else {
-    nav.innerHTML = `
+      } else {
+        nav.innerHTML = `
       <button class="btn btn-outline btn-sm" onclick="openAuth('login')">Login</button>
       <button class="btn btn-gold btn-sm" onclick="openAuth('register')">Register</button>`;
-    heroActions.innerHTML = `
+        heroActions.innerHTML = `
       <button class="btn btn-gold" onclick="openAuth('register')">Create Account</button>
       <button class="btn btn-purple" onclick="openAuth('login')">Login</button>
       <button class="btn btn-outline" onclick="document.getElementById('tests-grid').scrollIntoView({behavior:'smooth',block:'start'})">Explore Tests</button>`;
-  }
-}
+      }
+    }
 
-function showPage(name){
-  document.querySelectorAll('.page').forEach(page=>page.classList.remove('active'));
-  document.getElementById(`page-${name}`).classList.add('active');
-  navTabs.forEach(tab=>tab.classList.toggle('active', tab.dataset.page === name));
-  if(name === 'home') loadTests();
-  if(name === 'dashboard') loadDashboard();
-  if(name === 'history') loadHistory();
-  if(name === 'profile') loadProfile();
-  if(name === 'admin') loadAdmin();
-}
+    function showPage(name) {
+      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+      document.getElementById(`page-${name}`).classList.add('active');
+      navTabs.forEach(tab => tab.classList.toggle('active', tab.dataset.page === name));
+      if (name === 'home') loadTests();
+      if (name === 'dashboard') loadDashboard();
+      if (name === 'history') loadHistory();
+      if (name === 'profile') loadProfile();
+      if (name === 'admin') loadAdmin();
+    }
 
-function openAuth(view='login'){
-  document.getElementById('auth-modal').classList.add('active');
-  switchAuthView(view);
-}
-function closeAuth(){document.getElementById('auth-modal').classList.remove('active');}
-function switchAuthView(view){
-  document.querySelectorAll('.auth-tab').forEach(btn=>btn.classList.toggle('active', btn.dataset.authView===view));
-  document.querySelectorAll('.auth-view').forEach(panel=>panel.classList.add('hidden'));
-  document.getElementById(`auth-${view}`).classList.remove('hidden');
-  clearStatus('auth-status');
-}
+    function openAuth(view = 'login') {
+      document.getElementById('auth-modal').classList.add('active');
+      switchAuthView(view);
+    }
+    function closeAuth() { document.getElementById('auth-modal').classList.remove('active'); }
+    function switchAuthView(view) {
+      document.querySelectorAll('.auth-tab').forEach(btn => btn.classList.toggle('active', btn.dataset.authView === view));
+      document.querySelectorAll('.auth-view').forEach(panel => panel.classList.add('hidden'));
+      document.getElementById(`auth-${view}`).classList.remove('hidden');
+      clearStatus('auth-status');
+    }
 
-async function register(){
-  clearStatus('auth-status');
-  const name = document.getElementById('register-name').value.trim();
-  const email = document.getElementById('register-email').value.trim();
-  const password = document.getElementById('register-password').value;
-  const r = await api('register',{name,email,password},{silentAuth:true});
-  if(!r.success){showStatus('auth-status', r.message || 'Registration failed','bad');return;}
-  persistAuth(r);
-  showStatus('auth-status', 'Registration successful.','ok');
-  closeAuth();
-  toast('Welcome to QuizForge','success');
-  showPage('dashboard');
-}
+    async function register() {
+      clearStatus('auth-status');
+      const name = document.getElementById('register-name').value.trim();
+      const email = document.getElementById('register-email').value.trim();
+      const password = document.getElementById('register-password').value;
+      const r = await api('register', { name, email, password }, { silentAuth: true });
+      if (!r.success) { showStatus('auth-status', r.message || 'Registration failed', 'bad'); return; }
+      persistAuth(r);
+      showStatus('auth-status', 'Registration successful.', 'ok');
+      closeAuth();
+      toast('Welcome to QuizForge', 'success');
+      showPage('dashboard');
+    }
 
-async function login(){
-  clearStatus('auth-status');
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value;
-  const r = await api('login',{email,password},{silentAuth:true});
-  if(!r.success){showStatus('auth-status', r.message || 'Login failed','bad');return;}
-  persistAuth(r);
-  closeAuth();
-  toast('Login successful','success');
-  showPage('dashboard');
-}
+    async function login() {
+      clearStatus('auth-status');
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const r = await api('login', { email, password }, { silentAuth: true });
+      if (!r.success) { showStatus('auth-status', r.message || 'Login failed', 'bad'); return; }
+      persistAuth(r);
+      closeAuth();
+      toast('Login successful', 'success');
+      showPage('dashboard');
+    }
 
-function logout(){ clearAuth(); showPage('home'); }
+    function logout() { clearAuth(); showPage('home'); }
 
-async function requestReset(){
-  clearStatus('auth-status');
-  const email = document.getElementById('reset-email').value.trim();
-  const r = await api('request_password_reset',{email},{silentAuth:true});
-  if(!r.success){showStatus('auth-status', r.message || 'Could not generate token','bad');return;}
-  showStatus('auth-status', `${r.message} Token: ${r.reset_token || 'Check API response'}`,'ok');
-}
+    async function requestReset() {
+      clearStatus('auth-status');
+      const email = document.getElementById('reset-email').value.trim();
+      const r = await api('request_password_reset', { email }, { silentAuth: true });
+      if (!r.success) { showStatus('auth-status', r.message || 'Could not generate token', 'bad'); return; }
+      showStatus('auth-status', `${r.message} Token: ${r.reset_token || 'Check API response'}`, 'ok');
+    }
 
-async function resetPassword(){
-  clearStatus('auth-status');
-  const email = document.getElementById('reset-email').value.trim();
-  const reset_token = document.getElementById('reset-token').value.trim();
-  const new_password = document.getElementById('reset-password').value;
-  const r = await api('reset_password',{email,reset_token,new_password},{silentAuth:true});
-  if(!r.success){showStatus('auth-status', r.message || 'Reset failed','bad');return;}
-  showStatus('auth-status', r.message,'ok');
-}
+    async function resetPassword() {
+      clearStatus('auth-status');
+      const email = document.getElementById('reset-email').value.trim();
+      const reset_token = document.getElementById('reset-token').value.trim();
+      const new_password = document.getElementById('reset-password').value;
+      const r = await api('reset_password', { email, reset_token, new_password }, { silentAuth: true });
+      if (!r.success) { showStatus('auth-status', r.message || 'Reset failed', 'bad'); return; }
+      showStatus('auth-status', r.message, 'ok');
+    }
 
-async function bootstrapAuth(){
-  renderAuthNav();
-  if(!authToken) return;
-  const r = await api('me', {}, {silentAuth:true});
-  if(r.success){currentUser = r.user;localStorage.setItem('quizforge_user', JSON.stringify(currentUser));renderAuthNav();}
-  else clearAuth(true);
-}
+    async function bootstrapAuth() {
+      renderAuthNav();
+      if (!authToken) return;
+      const r = await api('me', {}, { silentAuth: true });
+      if (r.success) { currentUser = r.user; localStorage.setItem('quizforge_user', JSON.stringify(currentUser)); renderAuthNav(); }
+      else clearAuth(true);
+    }
 
-async function loadTests(){
-  const grid = document.getElementById('tests-grid');
-  grid.innerHTML = '<div class="empty">Loading tests...</div>';
-  try{
-    const r = await api('list_tests',{}, {silentAuth:true});
-    if(!r.success) throw new Error(r.message || 'Could not load tests');
-    allTests = r.tests || [];
-    renderTests();
-  } catch(err){
-    grid.innerHTML = `<div class="empty">${esc(err.message || 'Could not load tests')}</div>`;
-  }
-}
+    async function loadTests() {
+      const grid = document.getElementById('tests-grid');
+      grid.innerHTML = '<div class="empty">Loading tests...</div>';
+      try {
+        const r = await api('list_tests', {}, { silentAuth: true });
+        if (!r.success) throw new Error(r.message || 'Could not load tests');
+        allTests = r.tests || [];
+        renderTests();
+      } catch (err) {
+        grid.innerHTML = `<div class="empty">${esc(err.message || 'Could not load tests')}</div>`;
+      }
+    }
 
-function renderTests(){
-  const search = document.getElementById('test-search').value.trim().toLowerCase();
-  const topic = document.getElementById('topic-filter').value || 'all';
-  const select = document.getElementById('topic-filter');
-  const topics = [...new Set(allTests.map(t=>t.topic || 'General'))].sort((a,b)=>a.localeCompare(b));
-  const currentVal = select.value;
-  select.innerHTML = '<option value="all">All subjects</option>' + topics.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('');
-  select.value = topics.includes(currentVal) || currentVal === 'all' ? currentVal : 'all';
+    function renderTests() {
+      const search = document.getElementById('test-search').value.trim().toLowerCase();
+      const topic = document.getElementById('topic-filter').value || 'all';
+      const select = document.getElementById('topic-filter');
+      const topics = [...new Set(allTests.map(t => t.topic || 'General'))].sort((a, b) => a.localeCompare(b));
+      const currentVal = select.value;
+      select.innerHTML = '<option value="all">All subjects</option>' + topics.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
+      select.value = topics.includes(currentVal) || currentVal === 'all' ? currentVal : 'all';
 
-  const filtered = allTests.filter(t=>{
-    const matchTopic = select.value === 'all' || (t.topic || 'General') === select.value;
-    const haystack = [t.title,t.topic,t.description].filter(Boolean).join(' ').toLowerCase();
-    return matchTopic && (!search || haystack.includes(search));
-  });
-  document.getElementById('tests-summary').textContent = `${filtered.length} of ${allTests.length} tests`;
-  const grid = document.getElementById('tests-grid');
-  if(!filtered.length){
-    grid.innerHTML = '<div class="empty">No tests available for the current filters.</div>';
-    return;
-  }
-  const isAdmin = currentUser?.role === 'admin';
-  grid.innerHTML = filtered.map(test=>`
+      const filtered = allTests.filter(t => {
+        const matchTopic = select.value === 'all' || (t.topic || 'General') === select.value;
+        const haystack = [t.title, t.topic, t.description].filter(Boolean).join(' ').toLowerCase();
+        return matchTopic && (!search || haystack.includes(search));
+      });
+      document.getElementById('tests-summary').textContent = `${filtered.length} of ${allTests.length} tests`;
+      const grid = document.getElementById('tests-grid');
+      if (!filtered.length) {
+        grid.innerHTML = '<div class="empty">No tests available for the current filters.</div>';
+        return;
+      }
+      const isAdmin = currentUser?.role === 'admin';
+      grid.innerHTML = filtered.map(test => `
     <div class="card">
       <div class="badge gold">${esc(test.topic || 'General')}</div>
       <div class="card-title">${esc(test.title)}</div>
@@ -723,315 +1580,315 @@ function renderTests(){
         <span>${fmtDate(test.created_at)}</span>
       </div>
       <div class="split-actions">
-        <button class="btn btn-gold btn-sm" onclick="startTest(${test.id})" ${busyTestAction===`start-${test.id}`?'disabled':''}>Start</button>
-        ${isAdmin ? `<button class="btn btn-danger btn-sm" onclick="deleteTest(${test.id})" ${busyTestAction===`delete-${test.id}`?'disabled':''}>Delete</button>` : ''}
+        <button class="btn btn-gold btn-sm" onclick="startTest(${test.id})" ${busyTestAction === `start-${test.id}` ? 'disabled' : ''}>Start</button>
+        ${isAdmin ? `<button class="btn btn-danger btn-sm" onclick="deleteTest(${test.id})" ${busyTestAction === `delete-${test.id}` ? 'disabled' : ''}>Delete</button>` : ''}
       </div>
     </div>
   `).join('');
-}
+    }
 
-function setBusyTestAction(value){ busyTestAction = value; renderTests(); }
+    function setBusyTestAction(value) { busyTestAction = value; renderTests(); }
 
-function normalizeRuntimeQuestion(question){
-  if(!question || typeof question !== 'object') return null;
-  const options = Array.isArray(question.options)
-    ? question.options
-    : (() => {
-        if(typeof question.options !== 'string') return [];
-        try {
-          const parsed = JSON.parse(question.options);
-          return Array.isArray(parsed) ? parsed : [];
-        } catch(_err) {
-          return question.options
-            .split('|')
-            .map(item=>item.trim())
-            .filter(Boolean);
-        }
-      })();
-  const text = String(question.question || '').trim();
-  if(!text || !options.length) return null;
-  return {
-    ...question,
-    topic: String(question.topic || '').trim(),
-    question: text,
-    options: options.map(item=>String(item ?? '').trim()).filter(Boolean),
-    correct_answer: String(question.correct_answer ?? '').trim(),
-    explanation: String(question.explanation ?? '').trim()
-  };
-}
+    function normalizeRuntimeQuestion(question) {
+      if (!question || typeof question !== 'object') return null;
+      const options = Array.isArray(question.options)
+        ? question.options
+        : (() => {
+          if (typeof question.options !== 'string') return [];
+          try {
+            const parsed = JSON.parse(question.options);
+            return Array.isArray(parsed) ? parsed : [];
+          } catch (_err) {
+            return question.options
+              .split('|')
+              .map(item => item.trim())
+              .filter(Boolean);
+          }
+        })();
+      const text = String(question.question || '').trim();
+      if (!text || !options.length) return null;
+      return {
+        ...question,
+        topic: String(question.topic || '').trim(),
+        question: text,
+        options: options.map(item => String(item ?? '').trim()).filter(Boolean),
+        correct_answer: String(question.correct_answer ?? '').trim(),
+        explanation: String(question.explanation ?? '').trim()
+      };
+    }
 
-async function startTest(id){
-  if(!currentUser){openAuth('login');toast('Login to start a test','error');return;}
-  if(busyTestAction) return;
-  setBusyTestAction(`start-${id}`);
-  showLoader('Loading questions...');
-  try{
-    const r = await api('get_test',{test_id:id});
-    if(!r.success) throw new Error(r.message || 'Could not load test');
-    const normalizedQuestions = (Array.isArray(r.questions) ? r.questions : [])
-      .map(normalizeRuntimeQuestion)
-      .filter(Boolean);
-    if(!normalizedQuestions.length) throw new Error('This test has no valid questions.');
-    currentTest = r.test;
-    questions = normalizedQuestions;
-    isRandom = false;
-    qIndex = 0;
-    qStates = questions.map(()=>({chosen:null,skipped:false,marked:false}));
-    startTime = Date.now();
-    buildPalette();
-    document.getElementById('qt-name').textContent = currentTest.title;
-    document.getElementById('quiz-mode-badge').textContent = 'Live Test';
-    document.getElementById('quiz-overlay').classList.add('active');
-    loadQuestion();
-  } catch(err){
-    console.error('startTest failed', err);
-    toast(err.message || 'Could not start test','error');
-  } finally {
-    hideLoader();
-    setBusyTestAction(null);
-  }
-}
+    async function startTest(id) {
+      if (!currentUser) { openAuth('login'); toast('Login to start a test', 'error'); return; }
+      if (busyTestAction) return;
+      setBusyTestAction(`start-${id}`);
+      showLoader('Loading questions...');
+      try {
+        const r = await api('get_test', { test_id: id });
+        if (!r.success) throw new Error(r.message || 'Could not load test');
+        const normalizedQuestions = (Array.isArray(r.questions) ? r.questions : [])
+          .map(normalizeRuntimeQuestion)
+          .filter(Boolean);
+        if (!normalizedQuestions.length) throw new Error('This test has no valid questions.');
+        currentTest = r.test;
+        questions = normalizedQuestions;
+        isRandom = false;
+        qIndex = 0;
+        qStates = questions.map(() => ({ chosen: null, skipped: false, marked: false }));
+        startTime = Date.now();
+        buildPalette();
+        document.getElementById('qt-name').textContent = currentTest.title;
+        document.getElementById('quiz-mode-badge').textContent = 'Live Test';
+        document.getElementById('quiz-overlay').classList.add('active');
+        loadQuestion();
+      } catch (err) {
+        console.error('startTest failed', err);
+        toast(err.message || 'Could not start test', 'error');
+      } finally {
+        hideLoader();
+        setBusyTestAction(null);
+      }
+    }
 
-async function deleteTest(id){
-  if(!currentUser || currentUser.role !== 'admin'){toast('Admin access required','error');return;}
-  if(busyTestAction) return;
-  const test = allTests.find(t=>Number(t.id)===Number(id));
-  if(!test) return;
-  if(!confirm(`Delete "${test.title}" and all related results?`)) return;
-  setBusyTestAction(`delete-${id}`);
-  showLoader('Deleting test...');
-  try{
-    const r = await api('delete_test',{test_id:id});
-    if(!r.success) throw new Error(r.message || 'Delete failed');
-    toast('Test deleted','success');
-    await loadTests();
-    if(currentUser?.role === 'admin' && document.getElementById('page-admin').classList.contains('active')) await loadAdmin();
-  } catch(err){
-    toast(err.message || 'Delete failed','error');
-  } finally {
-    hideLoader();
-    setBusyTestAction(null);
-  }
-}
+    async function deleteTest(id) {
+      if (!currentUser || currentUser.role !== 'admin') { toast('Admin access required', 'error'); return; }
+      if (busyTestAction) return;
+      const test = allTests.find(t => Number(t.id) === Number(id));
+      if (!test) return;
+      if (!confirm(`Delete "${test.title}" and all related results?`)) return;
+      setBusyTestAction(`delete-${id}`);
+      showLoader('Deleting test...');
+      try {
+        const r = await api('delete_test', { test_id: id });
+        if (!r.success) throw new Error(r.message || 'Delete failed');
+        toast('Test deleted', 'success');
+        await loadTests();
+        if (currentUser?.role === 'admin' && document.getElementById('page-admin').classList.contains('active')) await loadAdmin();
+      } catch (err) {
+        toast(err.message || 'Delete failed', 'error');
+      } finally {
+        hideLoader();
+        setBusyTestAction(null);
+      }
+    }
 
-function buildPalette(){
-  const grid = document.getElementById('palette-grid');
-  grid.innerHTML = questions.map((_,i)=>`<button class="pal-btn" onclick="jumpToQuestion(${i})">${i+1}</button>`).join('');
-}
+    function buildPalette() {
+      const grid = document.getElementById('palette-grid');
+      grid.innerHTML = questions.map((_, i) => `<button class="pal-btn" onclick="jumpToQuestion(${i})">${i + 1}</button>`).join('');
+    }
 
-function updatePalette(){
-  document.querySelectorAll('.pal-btn').forEach((btn,i)=>{
-    btn.className = 'pal-btn';
-    const state = qStates[i];
-    if(i === qIndex) btn.classList.add('current');
-    if(state.chosen !== null) btn.classList.add('answered');
-    if(state.skipped) btn.classList.add('skipped');
-    if(state.marked) btn.classList.add('marked');
-  });
-}
+    function updatePalette() {
+      document.querySelectorAll('.pal-btn').forEach((btn, i) => {
+        btn.className = 'pal-btn';
+        const state = qStates[i];
+        if (i === qIndex) btn.classList.add('current');
+        if (state.chosen !== null) btn.classList.add('answered');
+        if (state.skipped) btn.classList.add('skipped');
+        if (state.marked) btn.classList.add('marked');
+      });
+    }
 
-function getTimePerQuestion(){ return isRandom ? 60 : parseInt(currentTest?.time_per_question || 60,10); }
-function stopTimer(){ clearInterval(timerInterval); timerInterval = null; }
-function startTimer(){
-  stopTimer();
-  const max = getTimePerQuestion();
-  document.getElementById('timer-text').textContent = `${timeLeft} sec`;
-  timerInterval = setInterval(()=>{
-    timeLeft--;
-    document.getElementById('timer-text').textContent = `${timeLeft} sec`;
-    if(timeLeft <= 0){
+    function getTimePerQuestion() { return isRandom ? 60 : parseInt(currentTest?.time_per_question || 60, 10); }
+    function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
+    function startTimer() {
       stopTimer();
-      skipQuestion();
+      const max = getTimePerQuestion();
+      document.getElementById('timer-text').textContent = `${timeLeft} sec`;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer-text').textContent = `${timeLeft} sec`;
+        if (timeLeft <= 0) {
+          stopTimer();
+          skipQuestion();
+        }
+      }, 1000);
     }
-  },1000);
-}
 
-function resolveCorrect(q){
-  const keys = ['A','B','C','D','E','F'];
-  const value = q.correct_answer;
-  if(keys.includes(value) && q.options[keys.indexOf(value)] !== undefined) return q.options[keys.indexOf(value)];
-  return value;
-}
-
-function loadQuestion(){
-  stopTimer();
-  const q = questions[qIndex];
-  const state = qStates[qIndex];
-  const total = questions.length;
-  document.getElementById('qt-counter').textContent = `Q ${qIndex+1} / ${total}`;
-  document.getElementById('qt-answered').textContent = `${qStates.filter(s=>s.chosen!==null).length} answered`;
-  document.getElementById('qm-topic').textContent = q.topic || 'General';
-  document.getElementById('qm-text').textContent = q.question;
-  const list = document.getElementById('options-list');
-  const correct = resolveCorrect(q);
-  const locked = state.chosen !== null || state.skipped;
-  const labels = ['A','B','C','D','E','F'];
-  list.innerHTML = '';
-  q.options.forEach((opt,i)=>{
-    const btn = document.createElement('button');
-    btn.className = 'opt';
-    btn.innerHTML = `<span class="opt-key">${labels[i]}</span><span>${esc(opt)}</span>`;
-    if(!locked){
-      btn.onclick = ()=>selectOption(opt);
-    } else {
-      if(opt === correct) btn.classList.add('reveal');
-      if(opt === state.chosen) btn.classList.add(opt === correct ? 'correct' : 'wrong');
+    function resolveCorrect(q) {
+      const keys = ['A', 'B', 'C', 'D', 'E', 'F'];
+      const value = q.correct_answer;
+      if (keys.includes(value) && q.options[keys.indexOf(value)] !== undefined) return q.options[keys.indexOf(value)];
+      return value;
     }
-    list.appendChild(btn);
-  });
-  document.getElementById('expl-card').classList.toggle('hidden', !locked);
-  if(locked){
-    const head = state.skipped ? 'Skipped' : state.chosen === correct ? 'Correct' : 'Incorrect';
-    document.getElementById('expl-head').textContent = head;
-    document.getElementById('expl-answer').textContent = `Correct answer: ${correct}`;
-    document.getElementById('expl-text').textContent = q.explanation || 'No explanation provided.';
-  }
-  document.getElementById('mark-btn').textContent = state.marked ? 'Marked' : 'Mark for Review';
-  document.getElementById('skip-btn').classList.toggle('hidden', locked);
-  document.getElementById('next-btn').classList.toggle('hidden', !(locked && qIndex < total - 1));
-  document.getElementById('finish-now-btn').classList.toggle('hidden', !(locked && qIndex === total - 1));
-  updatePalette();
-  if(!locked && getTimePerQuestion() > 0){
-    timeLeft = getTimePerQuestion();
-    startTimer();
-  } else {
-    document.getElementById('timer-text').textContent = locked ? 'Reviewed' : 'No timer';
-  }
-}
 
-function selectOption(value){
-  stopTimer();
-  qStates[qIndex].chosen = value;
-  loadQuestion();
-}
-function skipQuestion(){ stopTimer(); qStates[qIndex].skipped = true; loadQuestion(); }
-function nextQuestion(){ if(qIndex < questions.length - 1){ qIndex++; loadQuestion(); } else openFinishModal(); }
-function jumpToQuestion(i){ qIndex = i; loadQuestion(); }
-function toggleMark(){ qStates[qIndex].marked = !qStates[qIndex].marked; loadQuestion(); }
+    function loadQuestion() {
+      stopTimer();
+      const q = questions[qIndex];
+      const state = qStates[qIndex];
+      const total = questions.length;
+      document.getElementById('qt-counter').textContent = `Q ${qIndex + 1} / ${total}`;
+      document.getElementById('qt-answered').textContent = `${qStates.filter(s => s.chosen !== null).length} answered`;
+      document.getElementById('qm-topic').textContent = q.topic || 'General';
+      document.getElementById('qm-text').textContent = q.question;
+      const list = document.getElementById('options-list');
+      const correct = resolveCorrect(q);
+      const locked = state.chosen !== null || state.skipped;
+      const labels = ['A', 'B', 'C', 'D', 'E', 'F'];
+      list.innerHTML = '';
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt';
+        btn.innerHTML = `<span class="opt-key">${labels[i]}</span><span>${esc(opt)}</span>`;
+        if (!locked) {
+          btn.onclick = () => selectOption(opt);
+        } else {
+          if (opt === correct) btn.classList.add('reveal');
+          if (opt === state.chosen) btn.classList.add(opt === correct ? 'correct' : 'wrong');
+        }
+        list.appendChild(btn);
+      });
+      document.getElementById('expl-card').classList.toggle('hidden', !locked);
+      if (locked) {
+        const head = state.skipped ? 'Skipped' : state.chosen === correct ? 'Correct' : 'Incorrect';
+        document.getElementById('expl-head').textContent = head;
+        document.getElementById('expl-answer').textContent = `Correct answer: ${correct}`;
+        document.getElementById('expl-text').textContent = q.explanation || 'No explanation provided.';
+      }
+      document.getElementById('mark-btn').textContent = state.marked ? 'Marked' : 'Mark for Review';
+      document.getElementById('skip-btn').classList.toggle('hidden', locked);
+      document.getElementById('next-btn').classList.toggle('hidden', !(locked && qIndex < total - 1));
+      document.getElementById('finish-now-btn').classList.toggle('hidden', !(locked && qIndex === total - 1));
+      updatePalette();
+      if (!locked && getTimePerQuestion() > 0) {
+        timeLeft = getTimePerQuestion();
+        startTimer();
+      } else {
+        document.getElementById('timer-text').textContent = locked ? 'Reviewed' : 'No timer';
+      }
+    }
 
-function openFinishModal(){
-  document.getElementById('ms-answered').textContent = qStates.filter(s=>s.chosen!==null).length;
-  document.getElementById('ms-marked').textContent = qStates.filter(s=>s.marked).length;
-  document.getElementById('ms-unanswered').textContent = qStates.filter(s=>s.chosen===null && !s.skipped).length;
-  document.getElementById('finish-modal').classList.add('active');
-}
-function closeFinishModal(){ document.getElementById('finish-modal').classList.remove('active'); }
+    function selectOption(value) {
+      stopTimer();
+      qStates[qIndex].chosen = value;
+      loadQuestion();
+    }
+    function skipQuestion() { stopTimer(); qStates[qIndex].skipped = true; loadQuestion(); }
+    function nextQuestion() { if (qIndex < questions.length - 1) { qIndex++; loadQuestion(); } else openFinishModal(); }
+    function jumpToQuestion(i) { qIndex = i; loadQuestion(); }
+    function toggleMark() { qStates[qIndex].marked = !qStates[qIndex].marked; loadQuestion(); }
 
-async function submitTest(){
-  closeFinishModal();
-  stopTimer();
-  const timeTaken = Math.round((Date.now() - startTime) / 1000);
-  const answers = questions.map((q,i)=>{
-    const state = qStates[i];
-    const correct = resolveCorrect(q);
-    return {
-      q: q.question,
-      topic: q.topic || 'General',
-      chosen: state.chosen,
-      correct,
-      skipped: state.skipped,
-      marked: state.marked,
-      wasCorrect: state.chosen !== null && state.chosen === correct
-    };
-  });
-  const correct = answers.filter(a=>a.wasCorrect).length;
-  const wrong = answers.filter(a=>!a.wasCorrect && !a.skipped && a.chosen !== null).length;
-  const skipped = answers.filter(a=>a.skipped || a.chosen === null).length;
-  const total = answers.length;
-  const score = total ? Math.round((correct/total)*100) : 0;
-  if(currentTest && !isRandom){
-    await api('save_result',{test_id:currentTest.id,score,total,correct,wrong,skipped,time_taken:timeTaken,answers});
-  }
-  document.getElementById('quiz-overlay').classList.remove('active');
-  showResult({score,correct,wrong,skipped,total,timeTaken,answers});
-}
+    function openFinishModal() {
+      document.getElementById('ms-answered').textContent = qStates.filter(s => s.chosen !== null).length;
+      document.getElementById('ms-marked').textContent = qStates.filter(s => s.marked).length;
+      document.getElementById('ms-unanswered').textContent = qStates.filter(s => s.chosen === null && !s.skipped).length;
+      document.getElementById('finish-modal').classList.add('active');
+    }
+    function closeFinishModal() { document.getElementById('finish-modal').classList.remove('active'); }
 
-function showResult({score,correct,wrong,skipped,total,timeTaken,answers}){
-  document.getElementById('result-overlay').classList.add('active');
-  document.getElementById('r-score').textContent = `${score}%`;
-  document.getElementById('r-raw').textContent = `${correct} out of ${total} correct`;
-  const mood = score >= 80 ? ['Outstanding','Your preparation is looking sharp.'] : score >= 60 ? ['Strong Progress','You are building consistent momentum.'] : score >= 40 ? ['Keep Improving','Use topic analytics to target weak spots.'] : ['Needs Review','Focus on weak topics and retry.'];
-  document.getElementById('r-title').textContent = mood[0];
-  document.getElementById('r-sub').textContent = mood[1];
-  document.getElementById('result-stats').innerHTML = `
+    async function submitTest() {
+      closeFinishModal();
+      stopTimer();
+      const timeTaken = Math.round((Date.now() - startTime) / 1000);
+      const answers = questions.map((q, i) => {
+        const state = qStates[i];
+        const correct = resolveCorrect(q);
+        return {
+          q: q.question,
+          topic: q.topic || 'General',
+          chosen: state.chosen,
+          correct,
+          skipped: state.skipped,
+          marked: state.marked,
+          wasCorrect: state.chosen !== null && state.chosen === correct
+        };
+      });
+      const correct = answers.filter(a => a.wasCorrect).length;
+      const wrong = answers.filter(a => !a.wasCorrect && !a.skipped && a.chosen !== null).length;
+      const skipped = answers.filter(a => a.skipped || a.chosen === null).length;
+      const total = answers.length;
+      const score = total ? Math.round((correct / total) * 100) : 0;
+      if (currentTest && !isRandom) {
+        await api('save_result', { test_id: currentTest.id, score, total, correct, wrong, skipped, time_taken: timeTaken, answers });
+      }
+      document.getElementById('quiz-overlay').classList.remove('active');
+      showResult({ score, correct, wrong, skipped, total, timeTaken, answers });
+    }
+
+    function showResult({ score, correct, wrong, skipped, total, timeTaken, answers }) {
+      document.getElementById('result-overlay').classList.add('active');
+      document.getElementById('r-score').textContent = `${score}%`;
+      document.getElementById('r-raw').textContent = `${correct} out of ${total} correct`;
+      const mood = score >= 80 ? ['Outstanding', 'Your preparation is looking sharp.'] : score >= 60 ? ['Strong Progress', 'You are building consistent momentum.'] : score >= 40 ? ['Keep Improving', 'Use topic analytics to target weak spots.'] : ['Needs Review', 'Focus on weak topics and retry.'];
+      document.getElementById('r-title').textContent = mood[0];
+      document.getElementById('r-sub').textContent = mood[1];
+      document.getElementById('result-stats').innerHTML = `
     <div class="stat-card"><div class="stat-val">${correct}</div><div class="stat-lbl">Correct</div></div>
     <div class="stat-card"><div class="stat-val">${wrong}</div><div class="stat-lbl">Wrong</div></div>
     <div class="stat-card"><div class="stat-val">${skipped}</div><div class="stat-lbl">Skipped</div></div>
-    <div class="stat-card"><div class="stat-val">${(timeTaken/60).toFixed(1)}</div><div class="stat-lbl">Minutes</div></div>`;
-  const topicMap = {};
-  answers.forEach(a=>{ if(!topicMap[a.topic]) topicMap[a.topic] = {correct:0,total:0}; topicMap[a.topic].total++; if(a.wasCorrect) topicMap[a.topic].correct++; });
-  document.getElementById('topics-breakdown').innerHTML = Object.entries(topicMap).map(([topic,stats])=>{
-    const pct = fmtPct(stats.correct, stats.total);
-    return `<div class="topic-row"><span>${esc(topic)}</span><div class="topic-bar"><span style="width:${pct}%"></span></div><span class="mono muted">${pct}%</span></div>`;
-  }).join('') || '<div class="muted">No topic data available.</div>';
-  document.getElementById('result-log').innerHTML = answers.map((a,i)=>`
+    <div class="stat-card"><div class="stat-val">${(timeTaken / 60).toFixed(1)}</div><div class="stat-lbl">Minutes</div></div>`;
+      const topicMap = {};
+      answers.forEach(a => { if (!topicMap[a.topic]) topicMap[a.topic] = { correct: 0, total: 0 }; topicMap[a.topic].total++; if (a.wasCorrect) topicMap[a.topic].correct++; });
+      document.getElementById('topics-breakdown').innerHTML = Object.entries(topicMap).map(([topic, stats]) => {
+        const pct = fmtPct(stats.correct, stats.total);
+        return `<div class="topic-row"><span>${esc(topic)}</span><div class="topic-bar"><span style="width:${pct}%"></span></div><span class="mono muted">${pct}%</span></div>`;
+      }).join('') || '<div class="muted">No topic data available.</div>';
+      document.getElementById('result-log').innerHTML = answers.map((a, i) => `
     <div class="stat-card">
-      <div style="font-weight:800;margin-bottom:6px">Q${i+1}</div>
+      <div style="font-weight:800;margin-bottom:6px">Q${i + 1}</div>
       <div class="muted" style="line-height:1.55">${esc(a.q)}</div>
       <div class="mono muted" style="margin-top:10px">${a.skipped ? `Skipped | Correct: ${esc(a.correct)}` : a.wasCorrect ? `Your answer: ${esc(a.chosen)}` : `Your answer: ${esc(a.chosen || '-')}, Correct: ${esc(a.correct)}`}</div>
     </div>`).join('');
-}
+    }
 
-function retakeTest(){ document.getElementById('result-overlay').classList.remove('active'); if(currentTest) startTest(currentTest.id); }
-function backToHome(){ document.getElementById('result-overlay').classList.remove('active'); showPage('home'); }
+    function retakeTest() { document.getElementById('result-overlay').classList.remove('active'); if (currentTest) startTest(currentTest.id); }
+    function backToHome() { document.getElementById('result-overlay').classList.remove('active'); showPage('home'); }
 
-async function loadHistory(){
-  if(!currentUser){openAuth('login');return;}
-  const body = document.getElementById('history-body');
-  body.innerHTML = '<tr><td colspan="8" class="muted">Loading...</td></tr>';
-  const r = await api('get_history',{}, {method:'GET'});
-  if(!r.success || !r.results?.length){
-    body.innerHTML = '<tr><td colspan="8" class="muted">No attempts yet.</td></tr>';
-    return;
-  }
-  body.innerHTML = r.results.map(row=>`
+    async function loadHistory() {
+      if (!currentUser) { openAuth('login'); return; }
+      const body = document.getElementById('history-body');
+      body.innerHTML = '<tr><td colspan="8" class="muted">Loading...</td></tr>';
+      const r = await api('get_history', {}, { method: 'GET' });
+      if (!r.success || !r.results?.length) {
+        body.innerHTML = '<tr><td colspan="8" class="muted">No attempts yet.</td></tr>';
+        return;
+      }
+      body.innerHTML = r.results.map(row => `
     <tr>
       <td>${esc(row.title || 'Test')}</td>
       <td>${esc(row.topic || 'General')}</td>
-      <td>${fmtPct(row.correct,row.total)}%</td>
+      <td>${fmtPct(row.correct, row.total)}%</td>
       <td>${row.correct}</td>
       <td>${row.wrong}</td>
       <td>${row.skipped}</td>
-      <td>${(row.time_taken/60).toFixed(1)}m</td>
+      <td>${(row.time_taken / 60).toFixed(1)}m</td>
       <td>${fmtDate(row.taken_at)}</td>
     </tr>`).join('');
-}
+    }
 
-async function loadDashboard(){
-  if(!currentUser){openAuth('login');return;}
-  showLoader('Loading dashboard...');
-  try{
-    const r = await api('get_dashboard',{}, {method:'GET'});
-    if(!r.success) throw new Error(r.message || 'Could not load dashboard');
-    const s = r.summary;
-    document.getElementById('dashboard-stats').innerHTML = `
+    async function loadDashboard() {
+      if (!currentUser) { openAuth('login'); return; }
+      showLoader('Loading dashboard...');
+      try {
+        const r = await api('get_dashboard', {}, { method: 'GET' });
+        if (!r.success) throw new Error(r.message || 'Could not load dashboard');
+        const s = r.summary;
+        document.getElementById('dashboard-stats').innerHTML = `
       <div class="stat-card"><div class="stat-val">${s.attempts || 0}</div><div class="stat-lbl">Attempts</div></div>
       <div class="stat-card"><div class="stat-val">${Math.round(Number(s.avg_score || 0))}%</div><div class="stat-lbl">Average Score</div></div>
       <div class="stat-card"><div class="stat-val">${s.total_correct || 0}</div><div class="stat-lbl">Correct Answers</div></div>
-      <div class="stat-card"><div class="stat-val">${(Number(s.total_time || 0)/60).toFixed(1)}</div><div class="stat-lbl">Minutes Spent</div></div>`;
-    document.getElementById('dashboard-topics').innerHTML = (r.topics || []).map(topic=>{
-      const pct = fmtPct(topic.correct_count, topic.total_count);
-      return `<div class="topic-row"><span>${esc(topic.topic || 'General')}</span><div class="topic-bar"><span style="width:${pct}%"></span></div><span class="mono muted">${pct}%</span></div>`;
-    }).join('') || '<div class="muted">Start taking tests to unlock topic analytics.</div>';
-    document.getElementById('dashboard-recent').innerHTML = (r.recent || []).map(item=>`
+      <div class="stat-card"><div class="stat-val">${(Number(s.total_time || 0) / 60).toFixed(1)}</div><div class="stat-lbl">Minutes Spent</div></div>`;
+        document.getElementById('dashboard-topics').innerHTML = (r.topics || []).map(topic => {
+          const pct = fmtPct(topic.correct_count, topic.total_count);
+          return `<div class="topic-row"><span>${esc(topic.topic || 'General')}</span><div class="topic-bar"><span style="width:${pct}%"></span></div><span class="mono muted">${pct}%</span></div>`;
+        }).join('') || '<div class="muted">Start taking tests to unlock topic analytics.</div>';
+        document.getElementById('dashboard-recent').innerHTML = (r.recent || []).map(item => `
       <div class="stat-card">
         <div style="font-weight:800">${esc(item.title)}</div>
         <div class="muted" style="margin-top:6px">${esc(item.topic || 'General')}</div>
-        <div class="mono muted" style="margin-top:10px">${fmtPct(item.correct,item.total)}% · ${fmtDate(item.taken_at)}</div>
+        <div class="mono muted" style="margin-top:10px">${fmtPct(item.correct, item.total)}% · ${fmtDate(item.taken_at)}</div>
       </div>`).join('') || '<div class="muted">No attempts yet.</div>';
-  } catch(err){
-    toast(err.message || 'Could not load dashboard','error');
-  } finally {
-    hideLoader();
-  }
-}
+      } catch (err) {
+        toast(err.message || 'Could not load dashboard', 'error');
+      } finally {
+        hideLoader();
+      }
+    }
 
-async function loadProfile(){
-  if(!currentUser){openAuth('login');return;}
-  const r = await api('get_profile',{}, {method:'GET'});
-  if(!r.success){toast(r.message || 'Could not load profile','error');return;}
-  const stats = r.stats || {};
-  document.getElementById('profile-card').innerHTML = `
+    async function loadProfile() {
+      if (!currentUser) { openAuth('login'); return; }
+      const r = await api('get_profile', {}, { method: 'GET' });
+      if (!r.success) { toast(r.message || 'Could not load profile', 'error'); return; }
+      const stats = r.stats || {};
+      document.getElementById('profile-card').innerHTML = `
     <div class="grid">
       <div><span class="label">Name</span><div>${esc(r.user.name)}</div></div>
       <div><span class="label">Email</span><div>${esc(r.user.email)}</div></div>
@@ -1041,42 +1898,42 @@ async function loadProfile(){
       <div><span class="label">Average Score</span><div>${Math.round(Number(stats.avg_score || 0))}%</div></div>
       <div><span class="label">Last Attempt</span><div>${fmtDate(stats.last_attempt)}</div></div>
     </div>`;
-}
+    }
 
-async function changePassword(){
-  clearStatus('change-pass-status');
-  const current_password = document.getElementById('current-password').value;
-  const new_password = document.getElementById('new-password').value;
-  const r = await api('change_password',{current_password,new_password});
-  if(!r.success){showStatus('change-pass-status', r.message || 'Could not change password','bad');return;}
-  showStatus('change-pass-status', r.message,'ok');
-  document.getElementById('current-password').value='';
-  document.getElementById('new-password').value='';
-}
+    async function changePassword() {
+      clearStatus('change-pass-status');
+      const current_password = document.getElementById('current-password').value;
+      const new_password = document.getElementById('new-password').value;
+      const r = await api('change_password', { current_password, new_password });
+      if (!r.success) { showStatus('change-pass-status', r.message || 'Could not change password', 'bad'); return; }
+      showStatus('change-pass-status', r.message, 'ok');
+      document.getElementById('current-password').value = '';
+      document.getElementById('new-password').value = '';
+    }
 
-async function loadAdmin(){
-  if(!currentUser || currentUser.role !== 'admin'){showPage('home');return;}
-  showLoader('Loading admin workspace...');
-  try{
-    const [overview, users, tests] = await Promise.all([
-      api('admin_overview',{}, {method:'GET'}),
-      api('admin_list_users',{}, {method:'GET'}),
-      api('admin_list_tests',{}, {method:'GET'})
-    ]);
-    if(!overview.success) throw new Error(overview.message || 'Could not load admin overview');
-    document.getElementById('admin-stats').innerHTML = `
+    async function loadAdmin() {
+      if (!currentUser || currentUser.role !== 'admin') { showPage('home'); return; }
+      showLoader('Loading admin workspace...');
+      try {
+        const [overview, users, tests] = await Promise.all([
+          api('admin_overview', {}, { method: 'GET' }),
+          api('admin_list_users', {}, { method: 'GET' }),
+          api('admin_list_tests', {}, { method: 'GET' })
+        ]);
+        if (!overview.success) throw new Error(overview.message || 'Could not load admin overview');
+        document.getElementById('admin-stats').innerHTML = `
       <div class="stat-card"><div class="stat-val">${overview.stats.users}</div><div class="stat-lbl">Users</div></div>
       <div class="stat-card"><div class="stat-val">${overview.stats.tests}</div><div class="stat-lbl">Tests</div></div>
       <div class="stat-card"><div class="stat-val">${overview.stats.questions}</div><div class="stat-lbl">Questions</div></div>
       <div class="stat-card"><div class="stat-val">${overview.stats.attempts}</div><div class="stat-lbl">Attempts</div></div>`;
-    document.getElementById('admin-users-body').innerHTML = (users.users || []).map(user=>`
+        document.getElementById('admin-users-body').innerHTML = (users.users || []).map(user => `
       <tr>
         <td>${esc(user.name)}</td>
         <td>${esc(user.email)}</td>
         <td>
           <select class="select" onchange="updateUserRole(${user.id}, this.value)" ${user.id === currentUser.id ? 'disabled' : ''}>
-            <option value="student" ${user.role==='student'?'selected':''}>student</option>
-            <option value="admin" ${user.role==='admin'?'selected':''}>admin</option>
+            <option value="student" ${user.role === 'student' ? 'selected' : ''}>student</option>
+            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>admin</option>
           </select>
         </td>
         <td>${user.attempts}</td>
@@ -1084,7 +1941,7 @@ async function loadAdmin(){
           ${user.id === currentUser.id ? '<span class="mono muted">current</span>' : `<button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Delete</button>`}
         </td>
       </tr>`).join('');
-    document.getElementById('admin-tests-body').innerHTML = (tests.tests || []).map(test=>`
+        document.getElementById('admin-tests-body').innerHTML = (tests.tests || []).map(test => `
       <tr>
         <td>${esc(test.title)}</td>
         <td>${esc(test.creator_name || 'System')}</td>
@@ -1094,43 +1951,43 @@ async function loadAdmin(){
           <button class="btn btn-danger btn-sm" onclick="deleteTest(${test.id})">Delete</button>
         </td>
       </tr>`).join('');
-  } catch(err){
-    toast(err.message || 'Could not load admin workspace','error');
-  } finally {
-    hideLoader();
-  }
-}
+      } catch (err) {
+        toast(err.message || 'Could not load admin workspace', 'error');
+      } finally {
+        hideLoader();
+      }
+    }
 
-async function updateUserRole(userId, role){
-  const r = await api('admin_update_user_role',{user_id:userId,role});
-  if(!r.success){toast(r.message || 'Could not update role','error');return;}
-  toast('User role updated','success');
-  loadAdmin();
-}
+    async function updateUserRole(userId, role) {
+      const r = await api('admin_update_user_role', { user_id: userId, role });
+      if (!r.success) { toast(r.message || 'Could not update role', 'error'); return; }
+      toast('User role updated', 'success');
+      loadAdmin();
+    }
 
-async function deleteUser(userId){
-  if(!confirm('Delete this user and all their results?')) return;
-  const r = await api('admin_delete_user',{user_id:userId});
-  if(!r.success){toast(r.message || 'Could not delete user','error');return;}
-  toast('User deleted','success');
-  loadAdmin();
-}
+    async function deleteUser(userId) {
+      if (!confirm('Delete this user and all their results?')) return;
+      const r = await api('admin_delete_user', { user_id: userId });
+      if (!r.success) { toast(r.message || 'Could not delete user', 'error'); return; }
+      toast('User deleted', 'success');
+      loadAdmin();
+    }
 
-async function openQuestionEditor(testId){
-  clearStatus('editor-status');
-  const r = await api('admin_get_test_editor',{test_id:testId});
-  if(!r.success){toast(r.message || 'Could not load questions','error');return;}
-  document.getElementById('question-editor-panel').classList.remove('hidden');
-  document.getElementById('editor-test-id').value = testId;
-  document.getElementById('editor-question-id').value = '';
-  document.getElementById('editor-test-label').textContent = r.test.title;
-  adminEditorQuestions = r.questions || [];
-  renderEditorQuestions();
-  clearQuestionForm(false);
-}
+    async function openQuestionEditor(testId) {
+      clearStatus('editor-status');
+      const r = await api('admin_get_test_editor', { test_id: testId });
+      if (!r.success) { toast(r.message || 'Could not load questions', 'error'); return; }
+      document.getElementById('question-editor-panel').classList.remove('hidden');
+      document.getElementById('editor-test-id').value = testId;
+      document.getElementById('editor-question-id').value = '';
+      document.getElementById('editor-test-label').textContent = r.test.title;
+      adminEditorQuestions = r.questions || [];
+      renderEditorQuestions();
+      clearQuestionForm(false);
+    }
 
-function renderEditorQuestions(){
-  document.getElementById('editor-questions-body').innerHTML = adminEditorQuestions.map(q=>`
+    function renderEditorQuestions() {
+      document.getElementById('editor-questions-body').innerHTML = adminEditorQuestions.map(q => `
     <tr>
       <td>${q.question_no}</td>
       <td>${esc(q.topic || 'General')}</td>
@@ -1140,144 +1997,144 @@ function renderEditorQuestions(){
         <button class="btn btn-danger btn-sm" onclick="deleteQuestion(${q.id})">Delete</button>
       </td>
     </tr>`).join('');
-}
+    }
 
-function editQuestion(questionId){
-  const q = adminEditorQuestions.find(item=>Number(item.id)===Number(questionId));
-  if(!q) return;
-  document.getElementById('editor-question-id').value = q.id;
-  document.getElementById('editor-topic').value = q.topic || '';
-  document.getElementById('editor-question').value = q.question || '';
-  document.getElementById('editor-options').value = (q.options || []).join('\n');
-  document.getElementById('editor-answer').value = q.correct_answer || '';
-  document.getElementById('editor-explanation').value = q.explanation || '';
-}
+    function editQuestion(questionId) {
+      const q = adminEditorQuestions.find(item => Number(item.id) === Number(questionId));
+      if (!q) return;
+      document.getElementById('editor-question-id').value = q.id;
+      document.getElementById('editor-topic').value = q.topic || '';
+      document.getElementById('editor-question').value = q.question || '';
+      document.getElementById('editor-options').value = (q.options || []).join('\n');
+      document.getElementById('editor-answer').value = q.correct_answer || '';
+      document.getElementById('editor-explanation').value = q.explanation || '';
+    }
 
-function clearQuestionForm(resetStatus=true){
-  document.getElementById('editor-question-id').value = '';
-  document.getElementById('editor-topic').value = '';
-  document.getElementById('editor-question').value = '';
-  document.getElementById('editor-options').value = '';
-  document.getElementById('editor-answer').value = '';
-  document.getElementById('editor-explanation').value = '';
-  if(resetStatus) clearStatus('editor-status');
-}
+    function clearQuestionForm(resetStatus = true) {
+      document.getElementById('editor-question-id').value = '';
+      document.getElementById('editor-topic').value = '';
+      document.getElementById('editor-question').value = '';
+      document.getElementById('editor-options').value = '';
+      document.getElementById('editor-answer').value = '';
+      document.getElementById('editor-explanation').value = '';
+      if (resetStatus) clearStatus('editor-status');
+    }
 
-function closeQuestionEditor(){
-  document.getElementById('question-editor-panel').classList.add('hidden');
-  adminEditorQuestions = [];
-}
+    function closeQuestionEditor() {
+      document.getElementById('question-editor-panel').classList.add('hidden');
+      adminEditorQuestions = [];
+    }
 
-async function saveQuestion(){
-  clearStatus('editor-status');
-  const payload = {
-    test_id: Number(document.getElementById('editor-test-id').value),
-    question_id: Number(document.getElementById('editor-question-id').value || 0),
-    topic: document.getElementById('editor-topic').value.trim(),
-    question: document.getElementById('editor-question').value.trim(),
-    options: document.getElementById('editor-options').value.split('\n').map(v=>v.trim()).filter(Boolean),
-    correct_answer: document.getElementById('editor-answer').value.trim(),
-    explanation: document.getElementById('editor-explanation').value.trim()
-  };
-  const r = await api('admin_save_question', payload);
-  if(!r.success){showStatus('editor-status', r.message || 'Could not save question','bad');return;}
-  showStatus('editor-status', r.message,'ok');
-  await openQuestionEditor(payload.test_id);
-}
+    async function saveQuestion() {
+      clearStatus('editor-status');
+      const payload = {
+        test_id: Number(document.getElementById('editor-test-id').value),
+        question_id: Number(document.getElementById('editor-question-id').value || 0),
+        topic: document.getElementById('editor-topic').value.trim(),
+        question: document.getElementById('editor-question').value.trim(),
+        options: document.getElementById('editor-options').value.split('\n').map(v => v.trim()).filter(Boolean),
+        correct_answer: document.getElementById('editor-answer').value.trim(),
+        explanation: document.getElementById('editor-explanation').value.trim()
+      };
+      const r = await api('admin_save_question', payload);
+      if (!r.success) { showStatus('editor-status', r.message || 'Could not save question', 'bad'); return; }
+      showStatus('editor-status', r.message, 'ok');
+      await openQuestionEditor(payload.test_id);
+    }
 
-async function deleteQuestion(questionId){
-  if(!confirm('Delete this question?')) return;
-  const test_id = Number(document.getElementById('editor-test-id').value);
-  const r = await api('admin_delete_question',{test_id,question_id:questionId});
-  if(!r.success){showStatus('editor-status', r.message || 'Could not delete question','bad');return;}
-  showStatus('editor-status', r.message,'ok');
-  await openQuestionEditor(test_id);
-}
+    async function deleteQuestion(questionId) {
+      if (!confirm('Delete this question?')) return;
+      const test_id = Number(document.getElementById('editor-test-id').value);
+      const r = await api('admin_delete_question', { test_id, question_id: questionId });
+      if (!r.success) { showStatus('editor-status', r.message || 'Could not delete question', 'bad'); return; }
+      showStatus('editor-status', r.message, 'ok');
+      await openQuestionEditor(test_id);
+    }
 
-const dropZone = document.getElementById('drop-zone');
-const jsonInput = document.getElementById('json-file');
-dropZone.addEventListener('dragover', e=>{e.preventDefault();dropZone.classList.add('drag');});
-dropZone.addEventListener('dragleave', ()=>dropZone.classList.remove('drag'));
-dropZone.addEventListener('drop', e=>{e.preventDefault();dropZone.classList.remove('drag');if(e.dataTransfer.files.length)addFiles(e.dataTransfer.files);});
-jsonInput.addEventListener('change', e=>{if(e.target.files.length)addFiles(e.target.files);jsonInput.value='';});
+    const dropZone = document.getElementById('drop-zone');
+    const jsonInput = document.getElementById('json-file');
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
+    dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag'); if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); });
+    jsonInput.addEventListener('change', e => { if (e.target.files.length) addFiles(e.target.files); jsonInput.value = ''; });
 
-function normalizeQuestionClient(question, fallbackTopic=''){
-  if(!question || typeof question !== 'object' || Array.isArray(question)) return null;
-  const text = String(question.question || '').trim();
-  const options = (Array.isArray(question.options) ? question.options : []).map(v=>String(v ?? '').trim()).filter(Boolean);
-  let correct = question.correct_answer;
-  const topic = String(question.topic || fallbackTopic || '').trim();
-  const explanation = String(question.explanation || '').trim();
-  if(!text || options.length < 2 || correct === undefined || correct === null) return null;
-  if(Number.isInteger(correct) || /^\d+$/.test(String(correct).trim())){
-    const idx = Number(correct);
-    if(options[idx] !== undefined) correct = options[idx];
-  } else {
-    const value = String(correct).trim();
-    const letters = ['A','B','C','D','E','F'];
-    if(letters.includes(value.toUpperCase()) && options[letters.indexOf(value.toUpperCase())] !== undefined) correct = options[letters.indexOf(value.toUpperCase())];
-    else correct = value;
-  }
-  correct = String(correct).trim();
-  if(!correct || !options.includes(correct)) return null;
-  return {topic, question:text, options, correct_answer:correct, explanation};
-}
-
-function parseUploadPayload(raw, fileName){
-  const data = Array.isArray(raw) ? {questions:raw} : (raw && typeof raw === 'object' ? raw : null);
-  if(!data) throw new Error('JSON must be an array or object');
-  const rawQuestions = Array.isArray(raw) ? raw : (data.questions || data.items || data.mcqs);
-  if(!Array.isArray(rawQuestions) || !rawQuestions.length) throw new Error('Missing questions array');
-  const subject = String(data.subject || data.topic || '').trim();
-  const title = String(data.title || data.name || data.subject || fileName.replace(/\.json$/i,'')).trim();
-  const description = String(data.description || data.summary || '').trim();
-  const parsedTime = Number.parseInt(data.time_per_question ?? data.timePerQuestion ?? 60, 10);
-  const questions = rawQuestions.map(q=>normalizeQuestionClient(q, subject)).filter(Boolean);
-  if(!questions.length) throw new Error('No valid questions found');
-  return {
-    title,
-    description,
-    topic: subject,
-    time_per_question: Number.isNaN(parsedTime) ? 60 : Math.max(0, parsedTime),
-    questions
-  };
-}
-
-function addFiles(fileList){
-  Array.from(fileList).forEach(file=>{
-    if(!file.name.endsWith('.json')) return;
-    if(fileQueue.find(f=>f.name === file.name)) return;
-    const entry = {name:file.name, parsed:null, error:null, loading:true};
-    fileQueue.push(entry);
-    const idx = fileQueue.length - 1;
-    const reader = new FileReader();
-    reader.onload = e=>{
-      try{
-        entry.parsed = parseUploadPayload(JSON.parse(e.target.result), file.name);
-      } catch(err){
-        entry.error = err.message || 'Could not parse file';
+    function normalizeQuestionClient(question, fallbackTopic = '') {
+      if (!question || typeof question !== 'object' || Array.isArray(question)) return null;
+      const text = String(question.question || '').trim();
+      const options = (Array.isArray(question.options) ? question.options : []).map(v => String(v ?? '').trim()).filter(Boolean);
+      let correct = question.correct_answer;
+      const topic = String(question.topic || fallbackTopic || '').trim();
+      const explanation = String(question.explanation || '').trim();
+      if (!text || options.length < 2 || correct === undefined || correct === null) return null;
+      if (Number.isInteger(correct) || /^\d+$/.test(String(correct).trim())) {
+        const idx = Number(correct);
+        if (options[idx] !== undefined) correct = options[idx];
+      } else {
+        const value = String(correct).trim();
+        const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+        if (letters.includes(value.toUpperCase()) && options[letters.indexOf(value.toUpperCase())] !== undefined) correct = options[letters.indexOf(value.toUpperCase())];
+        else correct = value;
       }
-      entry.loading = false;
-      renderQueue();
-    };
-    reader.readAsText(file);
-  });
-  renderQueue();
-}
+      correct = String(correct).trim();
+      if (!correct || !options.includes(correct)) return null;
+      return { topic, question: text, options, correct_answer: correct, explanation };
+    }
 
-function renderQueue(){
-  const queue = document.getElementById('file-queue');
-  const clearBtn = document.getElementById('up-clear-btn');
-  const valid = fileQueue.filter(item=>item.parsed);
-  if(!fileQueue.length){
-    queue.style.display = 'none';
-    clearBtn.style.display = 'none';
-    document.getElementById('up-btn').disabled = true;
-    return;
-  }
-  queue.style.display = 'grid';
-  clearBtn.style.display = '';
-  queue.innerHTML = fileQueue.map((file,i)=>`
+    function parseUploadPayload(raw, fileName) {
+      const data = Array.isArray(raw) ? { questions: raw } : (raw && typeof raw === 'object' ? raw : null);
+      if (!data) throw new Error('JSON must be an array or object');
+      const rawQuestions = Array.isArray(raw) ? raw : (data.questions || data.items || data.mcqs);
+      if (!Array.isArray(rawQuestions) || !rawQuestions.length) throw new Error('Missing questions array');
+      const subject = String(data.subject || data.topic || '').trim();
+      const title = String(data.title || data.name || data.subject || fileName.replace(/\.json$/i, '')).trim();
+      const description = String(data.description || data.summary || '').trim();
+      const parsedTime = Number.parseInt(data.time_per_question ?? data.timePerQuestion ?? 60, 10);
+      const questions = rawQuestions.map(q => normalizeQuestionClient(q, subject)).filter(Boolean);
+      if (!questions.length) throw new Error('No valid questions found');
+      return {
+        title,
+        description,
+        topic: subject,
+        time_per_question: Number.isNaN(parsedTime) ? 60 : Math.max(0, parsedTime),
+        questions
+      };
+    }
+
+    function addFiles(fileList) {
+      Array.from(fileList).forEach(file => {
+        if (!file.name.endsWith('.json')) return;
+        if (fileQueue.find(f => f.name === file.name)) return;
+        const entry = { name: file.name, parsed: null, error: null, loading: true };
+        fileQueue.push(entry);
+        const idx = fileQueue.length - 1;
+        const reader = new FileReader();
+        reader.onload = e => {
+          try {
+            entry.parsed = parseUploadPayload(JSON.parse(e.target.result), file.name);
+          } catch (err) {
+            entry.error = err.message || 'Could not parse file';
+          }
+          entry.loading = false;
+          renderQueue();
+        };
+        reader.readAsText(file);
+      });
+      renderQueue();
+    }
+
+    function renderQueue() {
+      const queue = document.getElementById('file-queue');
+      const clearBtn = document.getElementById('up-clear-btn');
+      const valid = fileQueue.filter(item => item.parsed);
+      if (!fileQueue.length) {
+        queue.style.display = 'none';
+        clearBtn.style.display = 'none';
+        document.getElementById('up-btn').disabled = true;
+        return;
+      }
+      queue.style.display = 'grid';
+      clearBtn.style.display = '';
+      queue.innerHTML = fileQueue.map((file, i) => `
     <div class="stat-card">
       <div style="display:flex;justify-content:space-between;gap:12px">
         <div>
@@ -1287,53 +2144,54 @@ function renderQueue(){
         <button class="btn btn-ghost btn-sm" onclick="removeFile(${i})">X</button>
       </div>
     </div>`).join('');
-  document.getElementById('up-btn').disabled = !valid.length;
-}
+      document.getElementById('up-btn').disabled = !valid.length;
+    }
 
-function removeFile(i){ fileQueue.splice(i,1); renderQueue(); }
-function clearAllFiles(){ fileQueue = []; renderQueue(); clearStatus('upload-status'); }
+    function removeFile(i) { fileQueue.splice(i, 1); renderQueue(); }
+    function clearAllFiles() { fileQueue = []; renderQueue(); clearStatus('upload-status'); }
 
-async function submitUpload(){
-  clearStatus('upload-status');
-  if(!currentUser || currentUser.role !== 'admin'){showStatus('upload-status','Admin access required.','bad');return;}
-  const valid = fileQueue.filter(item=>item.parsed);
-  if(!valid.length){showStatus('upload-status','No valid JSON files selected.','bad');return;}
-  let uploaded = 0;
-  let failed = 0;
-  showLoader('Uploading tests...');
-  for(const file of valid){
-    const payload = {
-      title: document.getElementById('up-title').value.trim() || file.parsed.title,
-      description: document.getElementById('up-desc').value.trim() || file.parsed.description,
-      topic: document.getElementById('up-topic').value.trim() || file.parsed.topic,
-      time_per_question: Number.parseInt(document.getElementById('up-tpq').value,10),
-      questions: file.parsed.questions
-    };
-    const r = await api('upload_test', payload);
-    if(r.success) uploaded++; else failed++;
-  }
-  hideLoader();
-  if(uploaded){
-    showStatus('upload-status', `${uploaded} test(s) uploaded successfully.${failed ? ` ${failed} failed.` : ''}`,'ok');
-    clearAllFiles();
-    await loadTests();
-  } else {
-    showStatus('upload-status', 'All uploads failed.','bad');
-  }
-}
+    async function submitUpload() {
+      clearStatus('upload-status');
+      if (!currentUser || currentUser.role !== 'admin') { showStatus('upload-status', 'Admin access required.', 'bad'); return; }
+      const valid = fileQueue.filter(item => item.parsed);
+      if (!valid.length) { showStatus('upload-status', 'No valid JSON files selected.', 'bad'); return; }
+      let uploaded = 0;
+      let failed = 0;
+      showLoader('Uploading tests...');
+      for (const file of valid) {
+        const payload = {
+          title: document.getElementById('up-title').value.trim() || file.parsed.title,
+          description: document.getElementById('up-desc').value.trim() || file.parsed.description,
+          topic: document.getElementById('up-topic').value.trim() || file.parsed.topic,
+          time_per_question: Number.parseInt(document.getElementById('up-tpq').value, 10),
+          questions: file.parsed.questions
+        };
+        const r = await api('upload_test', payload);
+        if (r.success) uploaded++; else failed++;
+      }
+      hideLoader();
+      if (uploaded) {
+        showStatus('upload-status', `${uploaded} test(s) uploaded successfully.${failed ? ` ${failed} failed.` : ''}`, 'ok');
+        clearAllFiles();
+        await loadTests();
+      } else {
+        showStatus('upload-status', 'All uploads failed.', 'bad');
+      }
+    }
 
-document.addEventListener('keydown', e=>{
-  if(e.key === 'Escape'){
-    closeAuth();
-    closeFinishModal();
-  }
-});
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        closeAuth();
+        closeFinishModal();
+      }
+    });
 
-(async function init(){
-  renderAuthNav();
-  await bootstrapAuth();
-  loadTests();
-})();
-</script>
+    (async function init() {
+      renderAuthNav();
+      await bootstrapAuth();
+      loadTests();
+    })();
+  </script>
 </body>
+
 </html>
