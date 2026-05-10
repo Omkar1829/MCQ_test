@@ -22,20 +22,14 @@ function respond($payload, $status = 200) {
 
 function get_json_body() {
     $raw = file_get_contents("php://input");
-    if (!$raw) {
-        return [];
-    }
+    if (!$raw) return [];
     $decoded = json_decode($raw, true);
     return is_array($decoded) ? $decoded : [];
 }
 
 function array_is_list_compat($array) {
-    if (!is_array($array)) {
-        return false;
-    }
-    if (function_exists('array_is_list')) {
-        return array_is_list($array);
-    }
+    if (!is_array($array)) return false;
+    if (function_exists('array_is_list')) return array_is_list($array);
     return array_keys($array) === range(0, count($array) - 1);
 }
 
@@ -45,9 +39,7 @@ function base64url_encode($data) {
 
 function base64url_decode($data) {
     $padding = strlen($data) % 4;
-    if ($padding > 0) {
-        $data .= str_repeat('=', 4 - $padding);
-    }
+    if ($padding > 0) $data .= str_repeat('=', 4 - $padding);
     return base64_decode(strtr($data, '-_', '+/'));
 }
 
@@ -68,21 +60,13 @@ function create_jwt($payload) {
 
 function verify_jwt($token) {
     $parts = explode('.', $token);
-    if (count($parts) !== 3) {
-        return null;
-    }
+    if (count($parts) !== 3) return null;
     [$headerB64, $payloadB64, $signatureB64] = $parts;
     $expected = base64url_encode(hash_hmac('sha256', $headerB64 . '.' . $payloadB64, jwt_secret(), true));
-    if (!hash_equals($expected, $signatureB64)) {
-        return null;
-    }
+    if (!hash_equals($expected, $signatureB64)) return null;
     $payload = json_decode(base64url_decode($payloadB64), true);
-    if (!is_array($payload)) {
-        return null;
-    }
-    if (($payload['exp'] ?? 0) < time()) {
-        return null;
-    }
+    if (!is_array($payload)) return null;
+    if (($payload['exp'] ?? 0) < time()) return null;
     return $payload;
 }
 
@@ -92,9 +76,7 @@ function get_bearer_token() {
         $headers = getallheaders();
         $header = $headers['Authorization'] ?? $headers['authorization'] ?? '';
     }
-    if (stripos($header, 'Bearer ') === 0) {
-        return trim(substr($header, 7));
-    }
+    if (stripos($header, 'Bearer ') === 0) return trim(substr($header, 7));
     return '';
 }
 
@@ -206,27 +188,22 @@ if (!$adminStmt->fetchColumn()) {
 }
 
 function normalize_question($question, $fallbackTopic = '') {
-    if (!is_array($question)) {
-        return null;
-    }
+    if (!is_array($question)) return null;
     $questionText = trim((string)($question['question'] ?? ''));
     $options = $question['options'] ?? [];
     $correct = $question['correct_answer'] ?? null;
     $explanation = trim((string)($question['explanation'] ?? ''));
     $topic = trim((string)($question['topic'] ?? $fallbackTopic));
-    if ($questionText === '' || !is_array($options) || count($options) < 2) {
-        return null;
-    }
+
+    if ($questionText === '' || !is_array($options) || count($options) < 2) return null;
+
     $normalizedOptions = [];
     foreach ($options as $option) {
         $value = trim((string)$option);
-        if ($value !== '') {
-            $normalizedOptions[] = $value;
-        }
+        if ($value !== '') $normalizedOptions[] = $value;
     }
-    if (count($normalizedOptions) < 2) {
-        return null;
-    }
+    if (count($normalizedOptions) < 2) return null;
+
     if (is_int($correct) || ctype_digit((string)$correct)) {
         $idx = intval($correct);
         if ($idx >= 0 && $idx < count($normalizedOptions)) {
@@ -244,10 +221,10 @@ function normalize_question($question, $fallbackTopic = '') {
             $correct = $candidate;
         }
     }
+
     $correct = trim((string)$correct);
-    if ($correct === '' || !in_array($correct, $normalizedOptions, true)) {
-        return null;
-    }
+    if ($correct === '' || !in_array($correct, $normalizedOptions, true)) return null;
+
     return [
         'topic' => $topic,
         'question' => $questionText,
@@ -264,23 +241,20 @@ function normalize_upload_payload($body) {
         $questions = $payload;
         $payload = [];
     }
-    if (!is_array($questions)) {
-        $questions = [];
-    }
+    if (!is_array($questions)) $questions = [];
+
     $topic = trim((string)($payload['topic'] ?? $payload['subject'] ?? ''));
     $title = trim((string)($payload['title'] ?? $payload['name'] ?? $payload['subject'] ?? 'Untitled Test'));
     $description = trim((string)($payload['description'] ?? $payload['summary'] ?? ''));
     $timePerQuestion = intval($payload['time_per_question'] ?? $payload['timePerQuestion'] ?? 60);
-    if ($timePerQuestion < 0) {
-        $timePerQuestion = 60;
-    }
+    if ($timePerQuestion < 0) $timePerQuestion = 60;
+
     $normalizedQuestions = [];
     foreach ($questions as $question) {
         $normalized = normalize_question($question, $topic);
-        if ($normalized !== null) {
-            $normalizedQuestions[] = $normalized;
-        }
+        if ($normalized !== null) $normalizedQuestions[] = $normalized;
     }
+
     return [
         'title' => $title,
         'description' => $description,
@@ -293,24 +267,18 @@ function normalize_upload_payload($body) {
 function auth_user($conn, $required = true) {
     $token = get_bearer_token();
     if (!$token) {
-        if ($required) {
-            respond(['success' => false, 'message' => 'Unauthorized'], 401);
-        }
+        if ($required) respond(['success' => false, 'message' => 'Unauthorized'], 401);
         return null;
     }
     $payload = verify_jwt($token);
     if (!$payload) {
-        if ($required) {
-            respond(['success' => false, 'message' => 'Invalid or expired token'], 401);
-        }
+        if ($required) respond(['success' => false, 'message' => 'Invalid or expired token'], 401);
         return null;
     }
     $stmt = $conn->prepare("SELECT id, name, email, role, created_at FROM app_users WHERE id = :id LIMIT 1");
     $stmt->execute([':id' => intval($payload['sub'] ?? 0)]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$user && $required) {
-        respond(['success' => false, 'message' => 'User not found'], 401);
-    }
+    if (!$user && $required) respond(['success' => false, 'message' => 'User not found'], 401);
     return $user ?: null;
 }
 
@@ -369,12 +337,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$action) {
 }
 
 switch ($action) {
+
     case 'register':
         $name = trim((string)($body['name'] ?? ''));
         $email = strtolower(trim((string)($body['email'] ?? '')));
         $password = (string)($body['password'] ?? '');
         if ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($password) < 6) {
-            respond(['success' => false, 'message' => 'Name, valid email, and password of at least 6 characters are required.'], 422);
+            respond(['success' => false, 'message' => 'Name, valid email, and password (min 6 chars) required.'], 422);
         }
         $stmt = $conn->prepare("SELECT id FROM app_users WHERE email = :email LIMIT 1");
         $stmt->execute([':email' => $email]);
@@ -453,13 +422,11 @@ switch ($action) {
         $token = trim((string)($body['reset_token'] ?? ''));
         $newPassword = (string)($body['new_password'] ?? '');
         if ($token === '' || strlen($newPassword) < 6) {
-            respond(['success' => false, 'message' => 'Reset token and new password are required.'], 422);
+            respond(['success' => false, 'message' => 'Reset token and new password (min 6 chars) required.'], 422);
         }
         $stmt = $conn->prepare("
-            SELECT id, reset_expires_at
-            FROM app_users
-            WHERE email = :email AND reset_token = :token
-            LIMIT 1
+            SELECT id, reset_expires_at FROM app_users
+            WHERE email = :email AND reset_token = :token LIMIT 1
         ");
         $stmt->execute([':email' => $email, ':token' => $token]);
         $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -467,9 +434,7 @@ switch ($action) {
             respond(['success' => false, 'message' => 'Reset token is invalid or expired.'], 400);
         }
         $update = $conn->prepare("
-            UPDATE app_users
-            SET password_hash = :hash, reset_token = NULL, reset_expires_at = NULL
-            WHERE id = :id
+            UPDATE app_users SET password_hash = :hash, reset_token = NULL, reset_expires_at = NULL WHERE id = :id
         ");
         $update->execute([':hash' => password_hash($newPassword, PASSWORD_DEFAULT), ':id' => $userRow['id']]);
         respond(['success' => true, 'message' => 'Password reset successful.']);
@@ -535,13 +500,9 @@ switch ($action) {
 
     case 'get_test':
         $testId = intval($body['test_id'] ?? $_GET['test_id'] ?? 0);
-        if (!$testId) {
-            respond(["success" => false, "message" => "Missing test_id"], 422);
-        }
+        if (!$testId) respond(["success" => false, "message" => "Missing test_id"], 422);
         $test = fetch_test($conn, $testId);
-        if (!$test) {
-            respond(["success" => false, "message" => "Test not found"], 404);
-        }
+        if (!$test) respond(["success" => false, "message" => "Test not found"], 404);
         respond(["success" => true, "test" => $test, "questions" => fetch_questions($conn, $testId)]);
         break;
 
@@ -549,11 +510,9 @@ switch ($action) {
         $user = auth_user($conn);
         require_admin($user);
         $testId = intval($body['test_id'] ?? 0);
-        if (!$testId) {
-            respond(["success" => false, "message" => "Missing test_id"], 422);
-        }
-        $stmt = $conn->prepare("DELETE FROM mcq_tests WHERE id = :id");
-        $stmt->execute([':id' => $testId]);
+        if (!$testId) respond(["success" => false, "message" => "Missing test_id"], 422);
+        $conn->prepare("DELETE FROM mcq_results WHERE test_id = :id")->execute([':id' => $testId]);
+        $conn->prepare("DELETE FROM mcq_tests WHERE id = :id")->execute([':id' => $testId]);
         respond(["success" => true, "message" => "Test deleted."]);
         break;
 
@@ -592,21 +551,17 @@ switch ($action) {
         if ($testId) {
             $stmt = $conn->prepare("
                 SELECT r.*, t.title, t.topic
-                FROM mcq_results r
-                JOIN mcq_tests t ON t.id = r.test_id
+                FROM mcq_results r JOIN mcq_tests t ON t.id = r.test_id
                 WHERE r.user_id = :user_id AND r.test_id = :test_id
-                ORDER BY r.taken_at DESC
-                LIMIT 20
+                ORDER BY r.taken_at DESC LIMIT 20
             ");
             $stmt->execute([':user_id' => $user['id'], ':test_id' => $testId]);
         } else {
             $stmt = $conn->prepare("
                 SELECT r.*, t.title, t.topic
-                FROM mcq_results r
-                JOIN mcq_tests t ON t.id = r.test_id
+                FROM mcq_results r JOIN mcq_tests t ON t.id = r.test_id
                 WHERE r.user_id = :user_id
-                ORDER BY r.taken_at DESC
-                LIMIT 50
+                ORDER BY r.taken_at DESC LIMIT 50
             ");
             $stmt->execute([':user_id' => $user['id']]);
         }
@@ -623,8 +578,7 @@ switch ($action) {
                 COALESCE(SUM(wrong), 0) AS total_wrong,
                 COALESCE(SUM(skipped), 0) AS total_skipped,
                 COALESCE(SUM(time_taken), 0) AS total_time
-            FROM mcq_results
-            WHERE user_id = :user_id
+            FROM mcq_results WHERE user_id = :user_id
         ");
         $summaryStmt->execute([':user_id' => $user['id']]);
         $summary = $summaryStmt->fetch(PDO::FETCH_ASSOC);
@@ -651,11 +605,9 @@ switch ($action) {
 
         $recentStmt = $conn->prepare("
             SELECT r.*, t.title, t.topic
-            FROM mcq_results r
-            JOIN mcq_tests t ON t.id = r.test_id
+            FROM mcq_results r JOIN mcq_tests t ON t.id = r.test_id
             WHERE r.user_id = :user_id
-            ORDER BY r.taken_at DESC
-            LIMIT 8
+            ORDER BY r.taken_at DESC LIMIT 8
         ");
         $recentStmt->execute([':user_id' => $user['id']]);
 
@@ -670,12 +622,8 @@ switch ($action) {
     case 'get_profile':
         $user = auth_user($conn);
         $statsStmt = $conn->prepare("
-            SELECT
-                COUNT(*) AS attempts,
-                COALESCE(AVG(score), 0) AS avg_score,
-                MAX(taken_at) AS last_attempt
-            FROM mcq_results
-            WHERE user_id = :user_id
+            SELECT COUNT(*) AS attempts, COALESCE(AVG(score), 0) AS avg_score, MAX(taken_at) AS last_attempt
+            FROM mcq_results WHERE user_id = :user_id
         ");
         $statsStmt->execute([':user_id' => $user['id']]);
         respond([
@@ -703,10 +651,8 @@ switch ($action) {
         require_admin($user);
         $stmt = $conn->query("
             SELECT u.id, u.name, u.email, u.role, u.created_at, COUNT(r.id) AS attempts
-            FROM app_users u
-            LEFT JOIN mcq_results r ON r.user_id = u.id
-            GROUP BY u.id
-            ORDER BY u.created_at DESC
+            FROM app_users u LEFT JOIN mcq_results r ON r.user_id = u.id
+            GROUP BY u.id ORDER BY u.created_at DESC
         ");
         respond(['success' => true, 'users' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
         break;
@@ -731,8 +677,8 @@ switch ($action) {
         if (!$targetId || $targetId === intval($user['id'])) {
             respond(['success' => false, 'message' => 'Cannot delete this user.'], 422);
         }
-        $stmt = $conn->prepare("DELETE FROM app_users WHERE id = :id");
-        $stmt->execute([':id' => $targetId]);
+        $conn->prepare("DELETE FROM mcq_results WHERE user_id = :id")->execute([':id' => $targetId]);
+        $conn->prepare("DELETE FROM app_users WHERE id = :id")->execute([':id' => $targetId]);
         respond(['success' => true, 'message' => 'User deleted.']);
         break;
 
@@ -744,8 +690,7 @@ switch ($action) {
             FROM mcq_tests t
             LEFT JOIN mcq_questions q ON q.test_id = t.id
             LEFT JOIN app_users u ON u.id = t.created_by
-            GROUP BY t.id, u.name
-            ORDER BY t.created_at DESC
+            GROUP BY t.id, u.name ORDER BY t.created_at DESC
         ");
         respond(['success' => true, 'tests' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
         break;
@@ -754,13 +699,9 @@ switch ($action) {
         $user = auth_user($conn);
         require_admin($user);
         $testId = intval($body['test_id'] ?? $_GET['test_id'] ?? 0);
-        if (!$testId) {
-            respond(['success' => false, 'message' => 'Missing test_id'], 422);
-        }
+        if (!$testId) respond(['success' => false, 'message' => 'Missing test_id'], 422);
         $test = fetch_test($conn, $testId);
-        if (!$test) {
-            respond(['success' => false, 'message' => 'Test not found'], 404);
-        }
+        if (!$test) respond(['success' => false, 'message' => 'Test not found'], 404);
         respond(['success' => true, 'test' => $test, 'questions' => fetch_questions($conn, $testId)]);
         break;
 
@@ -776,7 +717,8 @@ switch ($action) {
         if ($questionId) {
             $stmt = $conn->prepare("
                 UPDATE mcq_questions
-                SET topic = :topic, question = :question, options = :options, correct_answer = :correct_answer, explanation = :explanation
+                SET topic = :topic, question = :question, options = :options,
+                    correct_answer = :correct_answer, explanation = :explanation
                 WHERE id = :id AND test_id = :test_id
             ");
             $stmt->execute([
@@ -819,8 +761,8 @@ switch ($action) {
         if (!$testId || !$questionId) {
             respond(['success' => false, 'message' => 'Missing ids.'], 422);
         }
-        $stmt = $conn->prepare("DELETE FROM mcq_questions WHERE id = :id AND test_id = :test_id");
-        $stmt->execute([':id' => $questionId, ':test_id' => $testId]);
+        $conn->prepare("DELETE FROM mcq_questions WHERE id = :id AND test_id = :test_id")
+            ->execute([':id' => $questionId, ':test_id' => $testId]);
         $countStmt = $conn->prepare("UPDATE mcq_tests SET total_questions = (SELECT COUNT(*) FROM mcq_questions WHERE test_id = :test_id) WHERE id = :test_id");
         $countStmt->execute([':test_id' => $testId]);
         respond(['success' => true, 'message' => 'Question deleted.']);
