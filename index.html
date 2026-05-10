@@ -682,7 +682,8 @@ function confirmResolve(val) {
 async function api(action, data = {}, opts = {}) {
   const headers = { 'Content-Type': 'application/json' };
   if (authToken) headers.Authorization = `Bearer ${authToken}`;
-  const url = opts.query ? `${API}?${new URLSearchParams({ action, ...opts.query })}` : API;
+  const qp = opts.method === 'GET' ? { action, ...opts.query } : opts.query ? { action, ...opts.query } : null;
+  const url = qp ? `${API}?${new URLSearchParams(qp)}` : API;
   try {
     const res = await fetch(url, {
       method: opts.method || 'POST',
