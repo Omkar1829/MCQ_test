@@ -10,11 +10,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // ── DB Connection ──
-$host     = "dpg-d77lipqdbo4c73arvtv0-a.singapore-postgres.render.com";
+$host     = "db.ienakmntjzlpkpaxefej.supabase.co";
 $port     = "5432";
-$dbname   = "unisphere_h4rb";
+$dbname   = "postgres";
 $user     = "root";
-$password = "eA4dn3XSdHcuo99MljBnLq1AOnZxpIUY";
+$password = "TheBestPasswordEver";
 
 try {
     $conn = new PDO(
