@@ -939,6 +939,32 @@
       color: var(--text);
     }
 
+    .question-copy {
+      white-space: normal;
+    }
+
+    .snippet-card {
+      margin-top: 18px;
+      padding: 18px 20px;
+      border-radius: 18px;
+      border: 1px solid rgba(99, 102, 241, .24);
+      background:
+        linear-gradient(180deg, rgba(20, 24, 35, .98), rgba(12, 15, 24, .98)),
+        radial-gradient(circle at top right, rgba(99, 102, 241, .14), transparent 45%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+      overflow-x: auto;
+    }
+
+    .snippet-card code {
+      display: block;
+      white-space: pre;
+      color: #eef2ff;
+      font-family: var(--mono);
+      font-size: .9rem;
+      line-height: 1.75;
+      tab-size: 2;
+    }
+
     .option-list {
       display: grid;
       gap: 12px;
@@ -958,6 +984,20 @@
       line-height: 1.5;
       color: var(--text);
       font-weight: 450;
+    }
+
+    .opt-copy {
+      display: block;
+      text-align: left;
+      white-space: normal;
+      flex: 1;
+    }
+
+    .opt-copy.is-code {
+      white-space: pre-wrap;
+      font-family: var(--mono);
+      font-size: .9rem;
+      line-height: 1.65;
     }
 
     .opt:hover {
@@ -1752,6 +1792,32 @@
     function toast(msg, type = 'success') { const el = document.getElementById('toast'); el.textContent = msg; el.className = `shown ${type}`; setTimeout(() => el.className = '', 3500); }
     function showStatus(id, msg, type) { const el = document.getElementById(id); if (!el) return; el.textContent = msg; el.className = `status shown ${type}`; }
     function clearStatus(id) { const el = document.getElementById(id); if (!el) return; el.textContent = ''; el.className = 'status'; }
+    function nl2br(value) { return esc(value).replace(/\n/g, '<br>'); }
+    function looksLikeSnippet(value) {
+      const text = String(value ?? '');
+      return /#include|printf\s*\(|scanf\s*\(|cout\s*<<|cin\s*>>|int\s+main|return\s+\d|for\s*\(|while\s*\(|if\s*\(|switch\s*\(|[{;}]/.test(text);
+    }
+    function renderQuestionMarkup(value) {
+      const text = String(value ?? '').replace(/\r\n/g, '\n').trim();
+      if (!text) return '<div class="question-copy">No question text available.</div>';
+      const parts = text.split(/\n\s*\n/);
+      if (parts.length > 1) {
+        const intro = parts.shift().trim();
+        const snippet = parts.join('\n\n').trim();
+        if (snippet && looksLikeSnippet(snippet)) {
+          return `<div class="question-copy">${nl2br(intro)}</div><pre class="snippet-card"><code>${esc(snippet)}</code></pre>`;
+        }
+      }
+      if (text.includes('\n') && looksLikeSnippet(text)) {
+        return `<pre class="snippet-card"><code>${esc(text)}</code></pre>`;
+      }
+      return `<div class="question-copy">${nl2br(text)}</div>`;
+    }
+    function renderOptionMarkup(value) {
+      const text = String(value ?? '').replace(/\r\n/g, '\n').trim();
+      const className = text.includes('\n') || looksLikeSnippet(text) ? 'opt-copy is-code' : 'opt-copy';
+      return `<span class="${className}">${nl2br(text)}</span>`;
+    }
 
     function confirmDialog(title, msg, yesLabel = 'Delete') {
       return new Promise(resolve => {
@@ -2074,7 +2140,7 @@
       document.getElementById('qt-counter').textContent = `Q ${qIndex + 1} / ${total}`;
       document.getElementById('qt-answered').textContent = `${qStates.filter(s => s.chosen !== null).length} answered`;
       document.getElementById('qm-topic').textContent = q.topic || 'General';
-      document.getElementById('qm-text').textContent = q.question;
+      document.getElementById('qm-text').innerHTML = renderQuestionMarkup(q.question);
 
       const list = document.getElementById('options-list');
       const correct = resolveCorrect(q);
@@ -2085,7 +2151,7 @@
       q.options.forEach((opt, i) => {
         const btn = document.createElement('button');
         btn.className = 'opt';
-        btn.innerHTML = `<span class="opt-key">${labels[i]}</span><span>${esc(opt)}</span>`;
+        btn.innerHTML = `<span class="opt-key">${labels[i]}</span>${renderOptionMarkup(opt)}`;
         if (!locked) {
           btn.onclick = () => selectOption(opt);
         } else {
